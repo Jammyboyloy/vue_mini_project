@@ -1,6 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap/dist/js/bootstrap.bundle.min.js'
 import 'bootstrap-icons/font/bootstrap-icons.css'
+import "./assets/vue3-lottie.css";
 
 
 // npm install vue-toastification@next
@@ -18,7 +19,6 @@ import Aura from "@primeuix/themes/aura";
 
 // npm install vue3-lottie@latest --save
 import Vue3Lottie from "vue3-lottie";
-import "vue3-lottie/dist/style.css";
 
 import "./assets/main.css";
 import "./assets/theme.css";
