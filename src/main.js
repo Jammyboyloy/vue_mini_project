@@ -18,7 +18,6 @@ import Aura from "@primeuix/themes/aura";
 
 // npm install vue3-lottie@latest --save
 import Vue3Lottie from "vue3-lottie";
-import "vue3-lottie/dist/style.css";
 
 import "./assets/main.css";
 import "./assets/theme.css";
