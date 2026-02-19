@@ -2,7 +2,9 @@
   <div
     class="card border-0 position-relative mt-5 bg-transparent"
     :style="{
-      '--badge': product?.category ? `'${product.category}'` : `'Unknown'`,
+      '--badge': product?.categories?.length
+        ? `'${ellipsisText(product.categories[0].name)}'`
+        : 'Unknown',
     }"
   >
     <div
@@ -10,19 +12,25 @@
     >
       <img :src="Logo" class="img-fluid" width="30px" alt="" />
       <div class="d-flex flex-column gap-0 fw-bold">
-        <p class="m-0">Vue</p>
+        <p class="m-0">Vue {{ product.id }}</p>
         <p class="m-0">JS</p>
       </div>
     </div>
     <div class="item bg-light pt-5 pb-1 px-5" style="height: 280px">
       <img
-        src="https://static.vecteezy.com/system/resources/previews/035/575/252/non_2x/men-s-t-shirt-isolated-on-transparent-background-free-png.png"
+        :src="product?.image"
         class="w-100 h-100 object-fit-contain"
         alt=""
       />
     </div>
     <div class="detail bg-light py-3">
-      <h6 class="text-center">T-shirt</h6>
+      <h6 class="text-center">{{ product.title }}</h6>
+    <div class="px-5 d-flex gap-4 justify-content-center">
+      <button class="btn bg-btn border-0 rounded-circle d-flex justify-content-center align-items-center" style="width: 50px; height: 50px;">
+        <ShoppingBag size="25"/>
+      </button>
+      <button class="btn bg-btn border-0 px-5 rounded-3 py-2">Buy now</button>
+    </div>
     </div>
   </div>
 </template>
@@ -30,8 +38,11 @@
 <script setup>
 import Logo from "@/assets/logo.svg";
 import "@/assets/card.css";
+import { ShoppingBag } from "lucide-vue-next";
+
 const ellipsisText = (text, limit = 15) => {
-  return text.slice(0, limit) + "...";
+  if (text.length > limit) return text.slice(0, limit) + "...";
+  else return text;
 };
 
 defineProps({
@@ -72,7 +83,7 @@ const getType = (index) => {
   align-items: center;
   font-size: 14px;
   font-weight: 500;
-  color: #66d19e;
+  color: #42b883;
 }
 .author {
   width: 55%;

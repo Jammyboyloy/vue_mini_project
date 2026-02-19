@@ -16,7 +16,7 @@
 
             <li class="nav-item">
               <router-link
-                to="/profile"
+                to="/shopping"
                 class="nav-link fs-6 fw-bold text-uppercase text-dark"
                 active-class="text-main"
               >
@@ -26,7 +26,7 @@
 
             <li class="nav-item">
               <router-link
-                to="/create-product"
+                to=""
                 class="nav-link fs-6 fw-bold text-uppercase text-dark"
                 active-class="text-main"
               >
