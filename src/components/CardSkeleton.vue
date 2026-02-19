@@ -1,23 +1,36 @@
 <template>
   <div class="card border-0 position-relative mt-5 bg-transparent">
-    <!-- author -->
+    
+    <!-- AUTHOR -->
     <div class="author ps-3 pt-2 d-flex align-items-center gap-3 bg-light">
       <div class="skeleton circle"></div>
-      <div class="d-flex flex-column gap-2 fw-bold">
+      <div class="d-flex flex-column gap-1 fw-bold">
         <div class="skeleton text-sm"></div>
         <div class="skeleton text-xs"></div>
       </div>
     </div>
 
-    <!-- image -->
+    <!-- IMAGE -->
     <div class="item bg-light pt-5 pb-1 px-5" style="height: 280px">
       <div class="skeleton image"></div>
     </div>
 
-    <!-- title -->
-    <div class="detail bg-light py-4 d-flex justify-content-center">
-      <div class="skeleton text-md"></div>
+    <!-- DETAIL -->
+    <div class="detail bg-light py-3">
+      
+      <!-- TITLE -->
+      <div class="d-flex justify-content-center">
+        <div class="skeleton text-md"></div>
+      </div>
+
+      <!-- BUTTONS -->
+      <div class="px-5 d-flex gap-4 justify-content-center mt-3">
+        <div class="skeleton btn-icon"></div>
+        <div class="skeleton btn-main"></div>
+      </div>
+
     </div>
+
   </div>
 </template>
 
@@ -26,6 +39,7 @@
   position: relative;
 }
 
+/* Badge Shape */
 .card::before {
   content: "";
   position: absolute;
@@ -57,6 +71,7 @@
   z-index: 1;
 }
 
+/* Shimmer Animation */
 @keyframes shimmer {
   0% {
     background-position: 200% 0;
@@ -66,6 +81,7 @@
   }
 }
 
+/* Sections */
 .author {
   width: 55%;
   height: 50px;
@@ -89,11 +105,12 @@
   z-index: 2;
 }
 
+/* Skeleton Base */
 .skeleton {
   position: relative;
   overflow: hidden;
   background: #e2e2e2;
-  border-radius: 8px;
+  border-radius: 20px;
 }
 
 .skeleton::after {
@@ -110,6 +127,7 @@
   animation: shimmer 1.2s infinite linear;
 }
 
+/* Shapes */
 .circle {
   width: 30px;
   height: 30px;
@@ -119,21 +137,37 @@
 .image {
   width: 100%;
   height: 100%;
-  border-radius: 20px;
+  border-radius: 30px;
 }
 
 .text-sm {
   width: 60px;
   height: 12px;
+  border-radius: 8px;
 }
 
 .text-xs {
   width: 40px;
   height: 10px;
+  border-radius: 8px;
 }
 
 .text-md {
-  width: 80px;
+  width: 200px;
   height: 14px;
+  border-radius: 10px;
+}
+
+/* Buttons */
+.btn-icon {
+  width: 65px;
+  height: 40px;
+  border-radius: 50px;
+}
+
+.btn-main {
+  width: 100%;
+  height: 40px;
+  border-radius: 50px;
 }
 </style>
