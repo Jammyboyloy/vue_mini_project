@@ -28,7 +28,9 @@ onMounted(() => {
             v-for="pro in product.productList"
             :key="pro.id"
           >
-            <BaseCard :product="pro" />
+            <router-link to="/" class="nav-link">
+              <BaseCard :product="pro" />
+            </router-link>
           </div>
         </template>
       </div>

@@ -26,7 +26,7 @@
 
             <li class="nav-item">
               <router-link
-                to=""
+                to="/login"
                 class="nav-link fs-6 fw-bold text-uppercase text-dark"
                 active-class="text-main"
               >
