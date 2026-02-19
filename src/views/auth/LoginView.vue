@@ -1,92 +1,77 @@
 <template>
-  <div class="container mt-5">
-    <section class="vh-100 d-flex align-items-center justify-content-center">
-      <!-- <div v-if="auth.loading" class="loading-only">
-        <div class="loader"></div>
-        <h5 class="mt-5">Loading...</h5>
-      </div> -->
-      <div class="container">
-        <div class="row justify-content-center">
-          <div class="col-12 col-md-8 col-lg-5">
-            <div class="card shadow-sm border-0">
-              <div class="card-body p-5 position-relative">
-                <h2 class="fw-bold mb-4 text-center">Login</h2>
+  <div class="bg-light">
+    <div
+      class="d-flex justify-content-center align-items-center min-vh-100 py-4 shadow-sm"
+    >
+      <div
+        class="container bg-white shadow-sm py-5 px-6 rounded-4"
+        style="width: 500px"
+      >
+        <h3 class="text-center text-main fw-medium">Sign In</h3>
+        <form @submit.prevent="handleLogin">
+          <label class="form-label">Email : </label>
+          <BaseInput
+            input-placeholder="Enter your email"
+            input-icon="Mail"
+            v-model="email"
+          />
+          <p v-if="err.email" class="text-danger m-0">{{ err.email }}</p>
 
-                <form @submit.prevent="handleLogin">
-                  <div class="mb-3">
-                    <label for="emailInput" class="form-label">
-                      Email address
-                    </label>
-                    <input
-                      v-model="email"
-                      type="text"
-                      class="form-control mb-2"
-                      id="emailInput"
-                      placeholder="name@example.com"
-                    />
-                    <p v-if="err.email" class="text-danger">{{ err.email }}</p>
-                  </div>
+          <label class="form-label my-2">Password : </label>
+          <div class="position-relative text-secondary mb-2">
+            <input
+              :type="showPassword ? 'text' : 'password'"
+              v-model="password"
+              class="form-control bg-prime fs-text ps-7"
+              placeholder="Enter your password"
+            />
 
-                  <div class="mb-3">
-                    <label for="passwordInput" class="form-label">
-                      Password
-                    </label>
-                    <input
-                      v-model="password"
-                      type="password"
-                      class="form-control mb-2"
-                      id="passwordInput"
-                    />
-                    <p v-if="err.password" class="text-danger">
-                      {{ err.password }}
-                    </p>
-                  </div>
+            <LockKeyhole
+              size="20"
+              class="position-absolute icon-input tran-y"
+            />
 
-                  <div
-                    class="d-flex justify-content-between align-items-center mb-4"
-                  >
-                    <div class="form-check">
-                      <input
-                        class="form-check-input"
-                        type="checkbox"
-                        id="rememberMe"
-                      />
-                      <label class="form-check-label" for="rememberMe">
-                        Remember me
-                      </label>
-                    </div>
-                    <a href="#" class="text-decoration-none small">
-                      Forgot password?
-                    </a>
-                  </div>
+            <Eye
+              v-if="!showPassword"
+              size="20"
+              class="position-absolute icon-eye tran-y cursor-pointer"
+              @click="togglePassword"
+            />
 
-                  <div class="d-grid">
-                    <button
-                      :disabled="isLoading"
-                      type="submit"
-                      class="btn btn-primary btn-lg"
-                    >
-                      <span
-                        v-if="isLoading"
-                        class="spinner-border spinner-border-sm me-2"
-                      ></span>
-                      <span>{{ isLoading ? "Signing In..." : "Sign In" }}</span>
-                    </button>
-                  </div>
-
-                  <p class="text-center mt-4 mb-0">
-                    Don't have an account?
-                    <router-link to="/register" class="text-decoration-none"
-                      >Sign Up</router-link
-                    >
-                  </p>
-                </form>
-              </div>
-            </div>
+            <EyeOff
+              v-else
+              size="20"
+              class="position-absolute icon-eye tran-y cursor-pointer"
+              @click="togglePassword"
+            />
           </div>
+          <p v-if="err.password" class="text-danger m-0">
+            {{ err.password }}
+          </p>
+
+          <button
+            :disabled="isLoading"
+            type="submit"
+            class="btn bg-btn border-0 btn-lg w-100 mt-3"
+          >
+            <span
+              v-if="isLoading"
+              class="spinner-border spinner-border-sm me-2 text-white"
+            ></span>
+            <span class="text-white">{{ isLoading ? "Signing In..." : "Sign In" }}</span>
+          </button>
+        </form>
+        <div class="d-flex gap-3 mt-3 align-items-center text-secondary">
+          <hr class="w-50" />
+          <p class="p-0 m-0 fs-6">OR</p>
+          <hr class="w-50" />
         </div>
+        <p class="m-0 fs-6 mt-2 text-center">
+          Don't have an account?
+          <router-link to="" class="ms-2 text-main">Register</router-link>
+        </p>
       </div>
-    </section>
+    </div>
   </div>
 </template>
 
@@ -95,17 +80,20 @@ import { reactive, ref } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
 import { isEmail, require, validates } from "@/utils/validate";
-import { notify } from "@/utils/toast";
-
-// import { useToast } from "vue-toastification";
-// let toast = useToast();
+import BaseInput from "@/components/BaseInput.vue";
+import { useToast } from "vue-toastification";
+let toast = useToast();
 
 const email = ref("");
 const password = ref("");
 const auth = useAuthStore();
-const router = useRouter();
-const toast = notify(router);
 const isLoading = ref(false);
+const router = useRouter();
+
+const showPassword = ref(false);
+const togglePassword = () => {
+  showPassword.value = !showPassword.value;
+};
 
 // toast.error("Something went wrong!");
 
@@ -115,7 +103,6 @@ const err = reactive({
 });
 
 function validate() {
-  // err.email = require(email.value, "Email is require");
   err.email = validates(email.value, [
     (v) => require(v, "Email is require"),
     (v) => isEmail(v, "Wrong Format Email"),
@@ -131,10 +118,8 @@ async function handleLogin() {
   isLoading.value = true;
   try {
     await auth.login(email.value, password.value);
-    router.push({ name: "home" });
+    router.push("/");
   } catch (error) {
-    // backend error message example
-    // console.log(error);
     toast.error(error.message);
   } finally {
     isLoading.value = false;
@@ -143,5 +128,22 @@ async function handleLogin() {
 </script>
 
 <style scoped>
+.tran-y {
+  transform: translateY(-50%);
+}
 
+.icon-input {
+  position: absolute;
+  top: 50%;
+  left: 18px;
+  font-size: 18px;
+}
+
+.icon-eye {
+  position: absolute;
+  top: 50%;
+  right: 18px;
+  font-size: 18px;
+  cursor: pointer;
+}
 </style>
