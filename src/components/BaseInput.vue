@@ -50,12 +50,4 @@ defineProps({
   left: 18px;
   font-size: 18px;
 }
-
-.icon-eye {
-  position: absolute;
-  top: 50%;
-  right: 18px;
-  font-size: 18px;
-  cursor: pointer;
-}
 </style>
