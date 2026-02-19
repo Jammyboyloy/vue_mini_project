@@ -29,3 +29,29 @@ body {
   background: #2563eb !important;
   color: #fff !important;
 }
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.bg-btn {
+  background-color: #42b883 !important;
+  color: white;
+}
+
+.bg-btn:hover {
+  color: white;
+}
+
+.text-main {
+  color: #66d19e !important;
+}
+
+.router-link-exact-active {
+  color: #66d19e !important;
+  /* border-bottom: 2px solid #66d19e !important; */
+}
+
+.fs-6 {
+  font-size: 16px !important;
+}
