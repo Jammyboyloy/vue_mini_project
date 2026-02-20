@@ -69,24 +69,6 @@
                     </div>
                 </div>
             </div>
-
-
-            <!-- sell item -->
-            <div class="my-5">
-                <h3>Your Item</h3>
-                <div class="card rounded-5" style="width: 18rem;">
-                    <img src="https://www.drakensberg.de/cdn/shop/files/DRAKENSBERG-Leder-Baumwoll-Reisetasche-Sam-Gruen-Safari-Style-Hauptansicht.jpg?v=1762468738&width=2500"
-                        class="card-img-top rounded-top-5" alt="...">
-                    <div class="card-body">
-                        <h5 class="card-title">Trip Bag</h5>
-                        <p class="card-text">
-                        <p>price: 500$</p>
-                        <p>varenty: 1 year</p>
-                        </p>
-                        <a href="#" class="btn btn-primary">View In details</a>
-                    </div>
-                </div>
-            </div>
         </div>
   </div>
 </template>
@@ -97,7 +79,7 @@ import Navbar from '@/components/Navbar.vue';
 
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 ul.timeline {
   list-style-type: none;
   position: relative;
