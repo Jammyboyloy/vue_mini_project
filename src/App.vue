@@ -22,12 +22,12 @@ const onFileChanged = ({ name, size, file }) => {
 
 <template>
   <div>
-    <!-- <RouterView /> -->
-     <PaymentView :file-name="txn.transaction_file"
+    <RouterView />
+     <!-- <PaymentView :file-name="txn.transaction_file"
             :file-size="txn.file_size"
             :file-object="txn.file_object"
             @file-changed="onFileChanged" v-model="txn.is_delivery" :address="txn.address" :google-map-url="txn.google_map_url"
-            @update:address="txn.address = $event" @update:google-map-url="txn.google_map_url = $event"></PaymentView>
+            @update:address="txn.address = $event" @update:google-map-url="txn.google_map_url = $event"></PaymentView> -->
   </div>
 </template>
 
