@@ -13,11 +13,13 @@
     "axios": "^1.13.5",
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",
+    "lottie-web": "^5.13.0",
     "lucide-vue-next": "^0.574.0",
     "pinia": "^3.0.4",
     "primeicons": "^7.0.0",
     "primevue": "^4.5.4",
     "vue": "^3.5.28",
+    "vue-advanced-cropper": "^2.8.9",
     "vue-router": "^5.0.2",
     "vue-toastification": "^2.0.0-rc.5",
     "vue3-lottie": "^3.3.1"
