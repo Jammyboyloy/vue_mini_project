@@ -35,7 +35,9 @@
             </li>
           </ul>
         </div>
-        <span class="navbar-brand fw-bold">📰 Shop</span>
+        <router-link to="/" class="navbar-brand fw-bold">
+          <img src="../assets/img/logo vue.png" class="" alt="" style="width: 150px; object-fit: contain;">
+        </router-link>
         <div class="d-flex align-items-center gap-3">
           <OverlayBadge
             @click="goLogin"

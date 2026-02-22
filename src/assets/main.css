@@ -70,3 +70,12 @@ body {
 .w-fit {
   width: fit-content !important;
 }
+
+.bg-btn:focus,
+.bg-btn:active,
+.bg-btn:focus-visible {
+  background-color: #42b883 !important;
+  box-shadow: none !important;
+  outline: none !important;
+  color: white !important;
+}

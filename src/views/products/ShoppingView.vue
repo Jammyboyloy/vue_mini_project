@@ -1,7 +1,6 @@
 <script setup>
 import BaseCard from "@/components/BaseCard.vue";
 import CardSkeleton from "@/components/CardSkeleton.vue";
-import Navbar from "@/components/Navbar.vue";
 import { useCartStore } from "@/stores/cart";
 import { useProductStore } from "@/stores/product";
 import { onMounted } from "vue";
@@ -41,7 +40,7 @@ const handleCart = (id) => {
             v-for="pro in product.productList"
             :key="pro.id"
           >
-            <router-link to="/" class="nav-link">
+            <router-link :to="`/detail/${pro.id}`" class="nav-link">
               <BaseCard :product="pro" @add-to-cart="handleCart" />
             </router-link>
           </div>
