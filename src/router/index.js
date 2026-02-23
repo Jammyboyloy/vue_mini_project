@@ -69,6 +69,18 @@ const router = createRouter({
           component: () => import("../views/products/CreateProductView.vue"),
           meta: { require: true },
         },
+        {
+          path: "customerOrder",
+          name: "customerOrder",
+          component: () => import("../views/order/CustomerOrderView.vue"),
+          meta: { require: true },
+        },
+        {
+          path: "previewOrder",
+          name: "previewOrder",
+          component: () => import("../views/order/previewOrderView.vue"),
+          meta: { require: true },
+        },
       ],
     },
   ],
