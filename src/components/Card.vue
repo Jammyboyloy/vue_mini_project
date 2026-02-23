@@ -25,20 +25,12 @@
     </div>
     <div class="detail bg-light py-3">
       <h6 class="text-center fw-medium">{{ product.title }}</h6>
-      <div class="px-5 d-flex gap-4 justify-content-center mt-3">
-        <button
-          @click.stop.prevent="$emit('addToCart', product.id)"
-          class="btn border-0 bg-btn rounded-5"
-        >
-          <ShoppingCart size="20" />
-        </button>
-        <button
-          class="btn bg-btn border-0 w-100 rounded-5 fw-medium"
-          @click.stop.prevent="hello"
-        >
-          Buy now
-        </button>
-      </div>
+    <div class="px-5 d-flex gap-4 justify-content-center mt-3">
+      <button class="btn border-0 bg-btn rounded-5">
+        <ShoppingCart size="20"/>
+      </button>
+      <button class="btn bg-btn border-0 w-100 rounded-5 fw-medium" @click.stop.prevent="hello">Buy now</button>
+    </div>
     </div>
   </div>
 </template>
@@ -56,8 +48,6 @@ defineProps({
   product: Object,
   index: Number,
 });
-
-defineEmits(["addToCart"]);
 
 function hello() {
   alert("hello");

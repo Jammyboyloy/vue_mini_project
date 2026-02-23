@@ -7,9 +7,25 @@ const router = createRouter({
   routes: [
     {
       path: "/",
-      name: "home",
-      component: HomeView,
-      meta: { require: true },
+      component: () => import("../layouts/LayoutNav.vue"),
+      children: [
+        {
+          path: "",
+          name: "home",
+          component: HomeView,
+          meta: { require: true },
+        },
+        {
+          path: "shopping",
+          name: "shopping",
+          component: () => import("../views/products/ShoppingView.vue"),
+        },
+        {
+          path: "detail",
+          name: "detail",
+          component: () => import("../views/products/ProductDetailView.vue"),
+        },
+      ],
     },
     {
       path: "/login",
@@ -17,9 +33,9 @@ const router = createRouter({
       component: () => import("../views/auth/LoginView.vue"),
     },
     {
-      path: "/shopping",
-      name: "shopping",
-      component: () => import("../views/products/ShoppingView.vue"),
+      path: "/checkout",
+      name: "checkout",
+      component: () => import("../views/payments/PaymentView.vue"),
     },
   ],
 });

@@ -8,7 +8,7 @@
               <router-link
                 to="/"
                 class="nav-link fs-6 fw-bold text-uppercase text-dark"
-                active-class="text-main"
+                exact-active-class="text-main"
               >
                 Home
               </router-link>
@@ -18,7 +18,7 @@
               <router-link
                 to="/shopping"
                 class="nav-link fs-6 fw-bold text-uppercase text-dark"
-                active-class="text-main"
+                exact-active-class="text-main"
               >
                 Shopping
               </router-link>
@@ -28,7 +28,7 @@
               <router-link
                 to="/login"
                 class="nav-link fs-6 fw-bold text-uppercase text-dark"
-                active-class="text-main"
+                exact-active-class="text-main"
               >
                 Create own product
               </router-link>
@@ -39,7 +39,7 @@
         <div class="d-flex align-items-center gap-3">
           <OverlayBadge
             @click="goLogin"
-            value="0"
+            :value="cart.countProduct"
             severity="danger"
             class="small-badge"
           >
@@ -92,16 +92,19 @@
 </template>
 
 <script setup>
-import { h } from "vue";
+import { h, onMounted } from "vue";
 import { LogOut, ShoppingBag, User, Package } from "lucide-vue-next";
 import Menu from "primevue/menu";
 import OverlayBadge from "primevue/overlaybadge";
-
 import { useRouter } from "vue-router";
+import { useCartStore } from "@/stores/cart";
+
 const router = useRouter();
 const goLogin = () => {
   router.push("/login");
 };
+
+const cart = useCartStore();
 
 const profileItems = [
   {

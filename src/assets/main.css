@@ -55,3 +55,18 @@ body {
 .fs-6 {
   font-size: 12px !important;
 }
+
+.bg-second {
+  background-color: #f8f9fa;
+}
+.bg-second:hover {
+  background-color: #f8f9fa;
+}
+
+.bg-cate {
+  background-color: #42b88333; 
+}
+
+.w-fit {
+  width: fit-content !important;
+}
