@@ -29,7 +29,6 @@
         v-else
         :column="columns"
         :rows="cate.category"
-        :loading="cate.loading"
         @edit="handleEdit"
         @delete="handleDelete"
       ></BaseTable>
