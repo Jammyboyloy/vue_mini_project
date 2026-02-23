@@ -12,23 +12,23 @@
 
                             <!-- icon -->
                             <div class="camera-overlay-half">
-                                <i class="fa-solid fa-camera"></i>
+                                <camera/>
                             </div>
                         </div>
 
                         <div class="mt-4">
-                            <h4>Ngorn</h4>
+                            <h4>{{ name }}</h4>
                             <div class="lh-1 mt-3">
-                                <p><span class="text-muted">Email:</span> khim***@gmail.com</p>
-                                <p><span class="text-muted">Created At:</span> kd</p>
+                                <p><span class="text-muted">Email:</span> {{email}}</p>
+                                <p><span class="text-muted">Created At:</span> {{created_at}}</p>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-6">
                     <div class="d-flex justify-content-end mt-8">
-                        <a href="asset/page/profile.html" class="btn btn-primary rounded-5 me-3">Edit Profile</a>
-                        <a href="#" class="btn btn-dark rounded-5">Sign out</a>
+                        <a href="asset/page/profile.html" class="btn bg-btn rounded-5 me-3">Edit Profile</a>
+                        <a href="#" class="btn btn-danger rounded-5">Sign out</a>
                     </div>
                 </div>
             </div>
@@ -39,15 +39,15 @@
                         <ul class="timeline">
                             <li>
                                 <span class="text-gray">Full Name</span>
-                                <p class=" fs-5 fw-bold">Ngorn</p>
+                                <p class=" fs-5 fw-bold">{{ name }}</p>
                             </li>
                             <li>
                                 <span class="text-gray">Email</span>
-                                <p class="fw-bold fs-5">ngorn@gmail.com</p>
+                                <p class="fw-bold fs-5">{{ email }}</p>
                             </li>
                             <li>
                                 <span class="text-gray">Address</span>
-                                <p class="fw-bold fs-5">Phnom Penh</p>
+                                <p class="fw-bold fs-5">{{ location }}</p>
                             </li>
                         </ul>
                     </div>
@@ -55,15 +55,15 @@
                         <ul class="mt-11 timeline">
                             <li>
                                 <span class="text-gray">Email</span>
-                                <p class="fw-bold fs-5">ngorn@gmail.com</p>
+                                <p class="fw-bold fs-5">{{ email }}</p>
                             </li>
                             <li>
                                 <span class="text-gray">ID</span>
-                                <p class="fw-bold fs-5">Phnom Penh</p>
+                                <p class="fw-bold fs-5">{{ id }}</p>
                             </li>
                             <li>
                                 <span class="text-gray">Phone Number</span>
-                                <p class="fw-bold fs-5">34567890</p>
+                                <p class="fw-bold fs-5">{{ phone }}</p>
                             </li>
                         </ul>
                     </div>
@@ -75,6 +75,26 @@
 
 <script setup>
 import Navbar from '@/components/Navbar.vue';
+import { useProfileStore } from '@/stores/profile';
+import { onMounted, ref } from 'vue';
+
+let profileStore = useProfileStore();
+let phone = ref('');
+let name = ref('');
+let email = ref('');
+let location = ref('');
+let created_at = ref('');
+let id = ref('');
+
+onMounted (async () => {
+    await profileStore.fetchProfile();
+    phone.value = profileStore.phone;
+    name.value = profileStore.name;
+    email.value = profileStore.email;
+    location.value = profileStore.location;
+    created_at.value = profileStore.created_at;
+    id.value = profileStore.id;
+})
 
 
 </script>
