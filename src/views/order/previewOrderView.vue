@@ -78,6 +78,11 @@
               </button>
             </td>
           </tr>
+          <tr v-if="order.processedOrders.length === 0 && !order.loading">
+            <td colspan="6" class="text-center py-5 text-muted">
+              All caught up! No pending orders.
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>
@@ -179,9 +184,7 @@
               <div
                 class="d-flex flex-column align-items-center gap-1 py-2 border shadow-sm rounded-4 bg-light"
               >
-                <div class="extra-small fw-bold text-dark">
-                  Receipt Image
-                </div>
+                <div class="extra-small fw-bold text-dark">Receipt Image</div>
                 <a :href="selectedOrder.transaction_file" target="_blank">
                   <img
                     :src="selectedOrder.transaction_file"
@@ -235,7 +238,6 @@ const statusBadgeClass = (status) => {
   const base = "badge rounded-pill px-3 py-2 fw-medium ";
   if (status === 2) return base + "bg-cate-success";
   if (status === 3) return base + "bg-cate-danger";
-  return base + "bg-secondary";
 };
 </script>
 

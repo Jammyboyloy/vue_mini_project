@@ -58,4 +58,12 @@ defineEmits(["delete", "edit"]);
   width: 120px;
   white-space: nowrap;
 }
+
+.table thead th {
+  font-size: .9rem;
+  letter-spacing: 1px;
+  color: #6c757d;
+  padding: 15px 10px;
+  text-transform: uppercase;
+}
 </style>
