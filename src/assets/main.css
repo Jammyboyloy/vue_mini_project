@@ -64,7 +64,7 @@ body {
 }
 
 .bg-cate-success {
-  background-color: #42b88333 !important;
+  background-color: #f0fff4 !important;
   color: #42b883 !important;
 }
 
@@ -74,12 +74,12 @@ body {
 }
 
 .bg-cate-warning {
-  background-color: #ffcc0033 !important;
+  background-color: #fff9eb !important;
   color: #ffcc00 !important;
 }
 
 .bg-cate-primary {
-  background-color: #3399ff33 !important;
+  background-color: #ebf5ff !important;
   color: #3399ff !important;
 }
 

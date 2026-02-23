@@ -9,7 +9,6 @@ export const useProfileStore = defineStore("profile", () => {
     try {
       const res = await api.get("/api/me");
       myProfile.value = res.data.data;
-      console.log(res);
     } catch (err) {
       console.log(err);
     } finally {

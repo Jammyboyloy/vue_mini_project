@@ -46,10 +46,9 @@
 </template>
 
 <script setup>
-import Logo from "@/assets/logo.svg";
 import "@/assets/card.css";
 
-const ellipsisText = (text, limit = 15) => {
+const ellipsisText = (text, limit = 10) => {
   if (text.length > limit) return text.slice(0, limit) + "...";
   else return text;
 };

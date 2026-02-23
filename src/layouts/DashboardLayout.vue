@@ -44,7 +44,7 @@
 
 <script setup>
 import Navbar from "@/components/Navbar.vue";
-import { Store, CirclePlus } from "lucide-vue-next";
+import { Store, CirclePlus, LayoutGrid, User, ListTodo } from "lucide-vue-next";
 import { ref } from "vue";
 const collapsed = ref(false);
 const toggleSidebar = () => {
@@ -57,6 +57,21 @@ const menuItems = [
     text: "Create Product",
     path: "/dashboard/createProduct",
     icon: CirclePlus,
+  },
+  {
+    text: "Category",
+    path: "/dashboard/category",
+    icon: LayoutGrid,
+  },
+  {
+    text: "Customer Order",
+    path: "/dashboard/customerOrder",
+    icon: User,
+  },
+  {
+    text: "Preview Order",
+    path: "/dashboard/previewOrder",
+    icon: ListTodo,
   },
 ];
 </script>
