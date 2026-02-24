@@ -110,12 +110,12 @@
               />
               <div>
                 <h6 class="fw-bold mb-1">{{ selectedOrder.product?.title }}</h6>
-                <p class="text-muted small mb-0">
-                  {{ selectedOrder.product?.detail }}
+                <p class="text-muted small mb-0 mt-2">
+                  {{ formatDate(selectedOrder?.created_at) }}
                 </p>
-                <span class="badge bg-light text-dark border small mt-2"
-                  >Condition: {{ selectedOrder.product?.condition }}</span
-                >
+                <p class="badge bg-light text-dark border small mt-2">
+                  Condition : {{ selectedOrder.product?.condition }}
+                </p>
               </div>
             </div>
           </div>
@@ -159,6 +159,10 @@
               <div class="col-12 mt-2" v-if="selectedOrder.address">
                 <label class="text-muted extra-small d-block">Address</label>
                 <p class="small mb-0">{{ selectedOrder.address }}</p>
+              </div>
+              <div class="col-12 mt-2" v-if="selectedOrder.address">
+                <label class="text-muted extra-small d-block">Phone</label>
+                <p class="small mb-0">{{ selectedOrder?.phone ?? "N/A" }}</p>
               </div>
             </div>
           </div>
@@ -218,7 +222,6 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useOrderStore } from "@/stores/order";
-import { Store } from "lucide-vue-next";
 import BaseModal from "@/components/BaseModal.vue"; // Adjust path to your modal component
 
 const order = useOrderStore();
@@ -239,6 +242,18 @@ const statusBadgeClass = (status) => {
   if (status === 2) return base + "bg-cate-success";
   if (status === 3) return base + "bg-cate-danger";
 };
+
+function formatDate(dateString) {
+  const date = new Date(dateString);
+
+  const options = {
+    month: "short",
+    day: "2-digit",
+    year: "numeric",
+  };
+
+  return date.toLocaleDateString("en-US", options);
+}
 </script>
 
 <style scoped>
