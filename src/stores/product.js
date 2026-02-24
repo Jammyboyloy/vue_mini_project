@@ -7,8 +7,8 @@ export const useProductStore = defineStore("product", () => {
   async function fetchProduct() {
     loading.value = true;
     try {
-      const res = await api.get("/api/products?page=1&per_page=8&search=");
-      console.log(res);
+      const res = await api.get("/api/products?page=1&per_page=100&search=");
+      // console.log(res);
       productList.value = res.data.data;
     } catch (err) {
       console.log(err);

@@ -11,7 +11,7 @@
     </div>
 
     <!-- IMAGE -->
-    <div class="item bg-light pt-5 pb-1 px-5" style="height: 280px">
+    <div class="item bg-light pt-5 pb-1 px-5" style="height: 250px">
       <div class="skeleton image"></div>
     </div>
 
@@ -153,8 +153,8 @@
 }
 
 .text-md {
-  width: 200px;
-  height: 14px;
+  width: 150px;
+  height: 15px;
   border-radius: 10px;
 }
 

@@ -1,13 +1,14 @@
 <script setup>
 import BaseCard from "@/components/BaseCard.vue";
 import CardSkeleton from "@/components/CardSkeleton.vue";
-import Navbar from "@/components/Navbar.vue";
 import { useCartStore } from "@/stores/cart";
 import { useProductStore } from "@/stores/product";
 import { onMounted } from "vue";
+import { useRouter } from "vue-router";
 
 const product = useProductStore();
 const cart = useCartStore();
+const router = useRouter();
 
 onMounted(() => {
   product.fetchProduct();
@@ -15,6 +16,11 @@ onMounted(() => {
 
 const handleCart = (id) => {
   cart.addToMyCart(id, cart.countQty);
+};
+
+const handleBuyNow = (id) => {
+  cart.addToMyCart(id, cart.countQty);
+  router.push("/myCart");
 };
 </script>
 
@@ -41,8 +47,8 @@ const handleCart = (id) => {
             v-for="pro in product.productList"
             :key="pro.id"
           >
-            <router-link to="/" class="nav-link">
-              <BaseCard :product="pro" @add-to-cart="handleCart" />
+            <router-link :to="`/detail/${pro.id}`" class="nav-link">
+              <BaseCard :product="pro" @add-to-cart="handleCart" @buy-now="handleBuyNow" />
             </router-link>
           </div>
         </template>

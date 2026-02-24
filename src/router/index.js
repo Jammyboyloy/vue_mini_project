@@ -21,7 +21,12 @@ const router = createRouter({
           component: () => import("../views/products/ShoppingView.vue"),
         },
         {
-          path: "detail",
+          path: "myCart",
+          name: "myCart",
+          component: () => import("../views/carts/CartsView.vue"),
+        },
+        {
+          path: "detail/:id",
           name: "detail",
           component: () => import("../views/products/ProductDetailView.vue"),
         },
@@ -36,6 +41,47 @@ const router = createRouter({
       path: "/checkout",
       name: "checkout",
       component: () => import("../views/payments/PaymentView.vue"),
+    },
+    {
+      path: "/profile",
+      name: "profile",
+      component: () => import("../views/profile/ProfileView.vue"),
+    },
+    {
+      path: "/dashboard",
+      component: () => import("../layouts/DashboardLayout.vue"),
+      children: [
+        {
+          path: "",
+          name: "dashboard",
+          component: () => import("../views/Dashboard.vue"),
+          meta: { require: true },
+        },
+        {
+          path: "category",
+          name: "category",
+          component: () => import("../views/categories/CategoryView.vue"),
+          meta: { require: true },
+        },
+        {
+          path: "createProduct",
+          name: "createProduct",
+          component: () => import("../views/products/CreateProductView.vue"),
+          meta: { require: true },
+        },
+        {
+          path: "customerOrder",
+          name: "customerOrder",
+          component: () => import("../views/order/CustomerOrderView.vue"),
+          meta: { require: true },
+        },
+        {
+          path: "previewOrder",
+          name: "previewOrder",
+          component: () => import("../views/order/previewOrderView.vue"),
+          meta: { require: true },
+        },
+      ],
     },
   ],
 });
