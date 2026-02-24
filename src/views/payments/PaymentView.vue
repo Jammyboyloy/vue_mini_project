@@ -36,7 +36,7 @@
                                     <div class="text-muted mt-1">{{ txn.file_size }}</div>
                                 </div>
                                 <div class="d-flex gap-2 flex-shrink-0">
-                                    <button
+                                    <button type="button"
                                         class="d-flex align-items-center justify-content-center rounded-2 action-btn text-main"
                                         title="Preview" :disabled="!fileUrl" @click="previewFile">
                                         <eye />
@@ -62,11 +62,7 @@
                             :class="{ dragover: dragging }" @dragover.prevent="dragging = true"
                             @dragleave="dragging = false" @drop.prevent="onDrop">
                             <div class="d-flex align-items-center gap-3">
-                                <cloud-upload class="upload-icon" style="
-                  font-size: 1.5rem;
-                  color: var(--muted);
-                  transition: color 0.2s;
-                " />
+                                <cloud-upload class="upload-icon" style="font-size: 1.5rem;transition: color 0.2s;" />
                                 <div class="d-flex flex-column gap-1">
                                     <span class="fw-bold" style="font-size: 0.85rem; color: var(--ink)">
                                         {{ txn.transaction_file ? "Replace file" : "Attach file" }}</span>
@@ -76,6 +72,9 @@
                             </div>
                             <input type="file" class="d-none" @change="onFileChange" />
                         </label>
+                        <span v-if="err.transaction_file" class="text-danger d-block mt-1" style="font-size: 0.8rem">
+                            {{ err.transaction_file }}
+                        </span>
                     </div>
 
                     <!-- Pick Up / Delivery toggle -->
@@ -89,7 +88,7 @@
                         <h5 class="text-main">Logistics Consultation</h5>
                         <div class="row g-3 mb-4">
                             <div class="col-6">
-                                <button
+                                <button type="button"
                                     class="method-card w-100 d-flex align-items-center gap-3 p-3 rounded-3 text-start shadow-sm"
                                     :class="{ 'bg-btn text-white': txn.is_delivery === 1 }" @click="switchMethod(1)">
                                     <div
@@ -112,7 +111,7 @@
                             </div>
 
                             <div class="col-6">
-                                <button
+                                <button type="button"
                                     class="method-card w-100 d-flex align-items-center gap-3 p-3 rounded-3 text-start shadow-sm"
                                     :class="{ 'bg-btn text-white': txn.is_delivery === 2 }" @click="switchMethod(2)">
                                     <div
@@ -133,6 +132,10 @@
                                 </button>
                             </div>
                         </div>
+
+                        <span v-if="err.is_delivery" class="text-danger d-block mt-1" style="font-size: 0.8rem">
+                            {{ err.is_delivery }}
+                        </span>
 
                         <!-- Location field -->
                         <Transition name="slide-fade">
@@ -168,7 +171,7 @@
                                                 @click.stop>
                                                 <square-arrow-up-right />
                                             </a>
-                                            <button
+                                            <button type="button"
                                                 class="d-flex align-items-center justify-content-center rounded-2 flex-shrink-0 icon-btn text-main"
                                                 @click="isEditing = true" title="Edit">
                                                 <pencil />
@@ -187,18 +190,23 @@
 
                                         <div class="position-relative ">
                                             <search class="position-absolute top-50 translate-middle-y text-muted"
-                                                style="left: 13px;font-size: 0.82rem;pointer-events: none;" size="15" />
+                                                style="left: 13px; font-size: 0.82rem;pointer-events: none;"
+                                                size="15" />
                                             <input class="form-control search-input themed-input pe-5"
                                                 :class="{ 'input-filled': localPlace }" type="text" v-model="localPlace"
                                                 @input="onInput" @keydown.enter="confirmPlace" :placeholder="txn.is_delivery === 1
                                                     ? 'Branch name or address\u2026'
                                                     : 'Delivery address or place name\u2026'
                                                     " @blur="confirmPlace" />
-                                            <button v-if="localPlace"
+                                            <button type="button" v-if="localPlace"
                                                 class="position-absolute top-50 end-0 translate-middle-y me-2 d-flex align-items-center justify-content-center rounded-2 bg-transparent btn text-main border-0"
                                                 @click="clearPlace" title="Clear">
                                                 <square-x />
                                             </button>
+                                            <!-- <span v-if="err.address" class="text-danger d-block mt-1"
+                                                style="font-size: 0.8rem">
+                                                {{ err.address }}
+                                            </span> -->
                                         </div>
 
                                         <div class="d-flex align-items-start gap-2 mt-2">
@@ -210,6 +218,13 @@
                                         </div>
                                     </template>
                                 </div>
+                                <span v-if="err.address || err.google_map_url " class="text-danger d-block mt-1" style="font-size: 0.8rem">
+                                    {{ err.address }} {{ err.google_map_url }}
+                                </span>
+                                <!-- <span v-if="err.google_map_url" class="text-danger d-block mt-1"
+                                    style="font-size: 0.8rem">
+                                    {{ err.google_map_url }}
+                                </span> -->
                             </div>
                         </Transition>
                     </div>
@@ -254,7 +269,7 @@
                                         <span v-if="txn.amount > 0"
                                             class="d-inline-flex align-items-center gap-1 px-2 rounded-pill fw-medium bg-btn"
                                             style="font-size: 0.8rem;">
-                                            <circle-check size="15" /> Filled
+                                            <!-- <circle-check size="15" /> Filled -->
                                         </span>
                                     </Transition>
                                 </div>
@@ -353,11 +368,18 @@
     </form>
 </template>
 <script setup>
-import { ref, computed, onUnmounted, watch } from "vue";
+import api from "@/api/https";
+import { useCartStore } from "@/stores/cart";
+import { notify } from "@/utils/toast";
+import { checkContent, checkFileSize, validates, require } from "@/utils/validate";
+import { ref, computed, onUnmounted, watch, onMounted, reactive } from "vue";
+// import { v, V } from "vue-router/dist/index-Cu9B0wDz.mjs";
+
+const cartStore = useCartStore();
 
 const txn = ref({
     id: 'TXN-' + Date.now(),
-    createdAt: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }),
+    createdAt: new Date().toLocaleDateString('kh-KH', { year: 'numeric', month: 'short', day: 'numeric' }),
     transaction_file: '',
     file_size: '',
     file_object: null,
@@ -377,6 +399,16 @@ watch(() => txn.value.file_object, (newFile) => {
     if (newFile) blobUrl = URL.createObjectURL(newFile);
 }, { immediate: true });
 
+// keep amount 
+onMounted(async () => {
+    await cartStore.fetchMyCart()
+    txn.value.amount = cartStore.total
+})
+
+watch(() => cartStore.total, (val) => {
+    txn.value.amount = val;
+}, { immediate: true })
+
 const fileUrl = computed(() => blobUrl);
 
 //it cleans up the temporary URL and prevents memory leaks.
@@ -384,26 +416,27 @@ onUnmounted(() => {
     if (blobUrl) URL.revokeObjectURL(blobUrl);
 });
 
-const fileIcon = computed(() => {
-    const f = (txn.value.transaction_file || "").toLowerCase();
-    if (f.endsWith(".pdf")) {
-        return "bi bi-file-earmark-pdf-fill";
-    }
-    if (f.match(/\.(png|jpg|jpeg|gif|webp)$/)) {
-        return "bi bi-file-earmark-image-fill";
-    }
-    if (f.match(/\.(xlsx|xls|csv)$/)) {
-        return "bi bi-file-earmark-spreadsheet-fill";
-    }
-    if (f.match(/\.(docx|doc)$/)) {
-        return "bi bi-file-earmark-word-fill";
-    }
-    return "bi bi-file-earmark-fill";
-});
+// const fileIcon = computed(() => {
+//     const f = (txn.value.transaction_file || "").toLowerCase();
+//     if (f.endsWith(".pdf")) {
+//         return "bi bi-file-earmark-pdf-fill";
+//     }
+//     if (f.match(/\.(png|jpg|jpeg|gif|webp)$/)) {
+//         return "bi bi-file-earmark-image-fill";
+//     }
+//     if (f.match(/\.(xlsx|xls|csv)$/)) {
+//         return "bi bi-file-earmark-spreadsheet-fill";
+//     }
+//     if (f.match(/\.(docx|doc)$/)) {
+//         return "bi bi-file-earmark-word-fill";
+//     }
+//     return "bi bi-file-earmark-fill";
+// });
 
 const previewFile = () => {
     if (fileUrl.value) window.open(fileUrl.value, "_blank");
 };
+
 // const downloadFile = () => {
 //     if (!fileUrl.value) return;
 //     const a = document.createElement("a");
@@ -419,6 +452,7 @@ const parseFile = (file) => {
     txn.value.transaction_file = file.name;
     txn.value.file_size = `${(file.size / 1024).toFixed(0)} KB · ${ext}`;
     txn.value.file_object = file;
+    err.value.transaction_file = "";
 
     justUploaded.value = true;
     setTimeout(() => (justUploaded.value = false), 3000);
@@ -443,6 +477,7 @@ const onInput = () => {
     txn.value.google_map_url = val
         ? `https://maps.google.com/maps?q=${encodeURIComponent(val)}`
         : "";
+    err.value.address = "";
 };
 
 const confirmPlace = () => {
@@ -467,12 +502,13 @@ const switchMethod = (val) => {
     localPlace.value = "";
     isEditing.value = true;
     txn.value.address = "";
+    err.value.is_delivery = "";
     txn.value.google_map_url = "";
 };
 
 // QR
 const formatCurrency = (val) =>
-    new Intl.NumberFormat("kh-KH", { style: "currency", currency: "KHR" }).format(
+    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(
         val || 0,
     );
 
@@ -523,16 +559,65 @@ const embedUrl = computed(() =>
         : "",
 );
 
-// ✅ Add to onUnmounted
+// Add to onUnmounted
 onUnmounted(() => {
     if (blobUrl) URL.revokeObjectURL(blobUrl);
-    clearTimeout(timer); // add this
+    clearTimeout(timer);
 });
 
-const saveCheckout = () => {
-    // your save/submit logic here
-    console.log("Checkout payload:", txn.value);
+const err = reactive({
+    transaction_file: "",
+    is_delivery: '',
+    address: '',
+    google_map_url: '',
+})
+
+function validate() {
+    err.transaction_file = validates(txn.value.file_object, [
+        (v) => require(v, "Transaction file is required."),
+        (v) => checkFileSize(v)
+    ]);
+
+    err.is_delivery = require(txn.value.is_delivery, "Please select Pick Up or Delivery.")
+
+    const addressMsg = txn.value.is_delivery === 1
+        ? "Please enter a pick-up location."
+        : "Please enter a delivery address.";
+
+    err.address = validates(txn.value.address, [
+        (v) => require(v, addressMsg),
+        (v) => checkContent(v, "Location is too short, please be more specific.")
+    ])
+
+    err.google_map_url = require(txn.value.google_map_url, "Map URL is missing, please re-enter your location.")
+
+    return !err.transaction_file && !err.address && !err.google_map_url && !err.is_delivery
+}
+
+const saveCheckout = async () => {
+    if (!validate()) return;
+
+    try {
+        const { file_object, transaction_file, ...payload } = txn.value;
+
+        const form = new FormData();
+
+        Object.entries(payload).forEach(([key, value]) => {
+            form.append(key, value ?? "");
+        });
+
+        if (file_object) {
+            form.append("transaction_file", file_object);
+        }
+
+        const res = await api.post("/api/carts/checkout", form);
+        console.log("Success:", res.data);
+    } catch (err) {
+        console.error(err);
+        toast.error(err.message);
+    }
 };
+
 </script>
 
 <style scoped>
