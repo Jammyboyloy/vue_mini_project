@@ -11,6 +11,7 @@
         </div>
       </div>
       <button
+        @click="goCreateProduct"
         class="btn bg-btn d-flex align-items-center gap-2 px-4 rounded-pill"
       >
         <Plus :size="18" /> New Product
@@ -100,7 +101,6 @@
         v-else
         :column="columns"
         :rows="own.ownProduct"
-        @edit="handleEdit"
         @delete="handleDelete"
       >
         <template #col-image="{ value }">
@@ -112,14 +112,14 @@
         </template>
 
         <template #col-categories="{ value }">
-          
-          {{ value[0]?.name ?? "N/A" }}
+          <p class="badge rounded-pill px-4 py-2 fw-medium bg-cate-success">
+            {{ value[0]?.name ?? "N/A" }}
+          </p>
         </template>
 
         <template #col-price="{ value }">
           <p class="text-main m-0 fw-bold">US ${{ value }}</p>
         </template>
-
       </BaseTable>
 
       <!-- <BasePagination
@@ -133,21 +133,31 @@
       /> -->
 
       <!-- Create Modal / Edit Modal -->
-      <BaseModal v-if="showModal" @close-modal="closeModal">
+      <BaseModal
+        v-if="showModal"
+        @close-modal="closeModal()"
+        position="justify-content-center"
+      >
         <template #header>
-          <h1 class="modal-title fs-5 mx-auto">{{ modalTile }}</h1>
+          <h1 class="modal-title fs-4 mx-auto fw-bold">
+            Delete Item #{{ items.id }}
+          </h1>
         </template>
         <template #body>
-          <BaseInput
-            input-placeholder="Enter Category Name"
-            input-icon="LayoutDashboard"
-            v-model="categoryName"
-            :isDisabled="isDisabled"
+          <img
+            :src="items.image"
+            alt=""
+            width="150"
+            height="110"
+            class="rounded-4 object-fit-cover mx-auto d-block mb-5"
           />
+          <p class="text-center m-0" style="font-size: 18px">
+            Are you sure you want to delete {{ items.title }} ?
+          </p>
         </template>
         <template #footer>
           <button
-            :class="`btn btn-${color}`"
+            class="btn btn-danger px-6 rounded-pill py-2"
             @click="handleAction"
             :disabled="loading"
           >
@@ -155,7 +165,7 @@
               v-if="loading"
               class="spinner-border spinner-border-sm me-2"
             ></span>
-            {{ modalConfirm }}
+            Delete
           </button>
         </template>
       </BaseModal>
@@ -166,9 +176,12 @@
 <script setup>
 import BaseModal from "@/components/BaseModal.vue";
 import { useOwnProductStore } from "@/stores/OwnProduct";
-import BaseInput from "@/components/BaseInput.vue";
 import BaseTable from "@/components/BaseTable.vue";
 import { onMounted, ref } from "vue";
+import api from "@/api/https";
+import { useRouter } from "vue-router";
+import { useToast } from "vue-toastification";
+let toast = useToast();
 
 const own = useOwnProductStore();
 let columns = [
@@ -178,74 +191,36 @@ let columns = [
   { label: "Category", key: "categories" },
 ];
 let showModal = ref(false);
-let categoryName = ref("");
 let loading = ref(false);
-let modalTile = ref("");
-let modalConfirm = ref("");
-let isEdit = ref(null);
-let isDelete = ref(null);
-let color = ref("danger");
-let isDisabled = ref(false);
-onMounted(async () => {
-  await cate.fetchCategory(1, per_page.value);
-  console.log(cate.category);
-  console.log(cate.pagination);
-});
+let items = ref([]);
+const router = useRouter();
 
 async function handleAction() {
   loading.value = true;
   try {
-    if (isEdit.value) {
-      await api.put(`/categories/${isEdit.value}`, {
-        name: categoryName.value,
-      });
-    } else if (isDelete.value) {
-      await api.delete(`/categories/${isDelete.value}`);
-    } else await api.post("/categories", { name: categoryName.value });
+    await api.delete(`/api/products/${items.value.id}`);
+    toast.success("Delete Successfully!");
   } catch (err) {
     console.log(err);
   } finally {
-    loading.value = false;
     showModal.value = false;
-    isEdit.value = null;
-    isDelete.value = null;
-    cate.fetchCategory(1, per_page.value);
+    loading.value = false;
+    own.fetchMyOwnProduct();
   }
 }
 
-const changePage = (page) => {
-  cate.fetchCategory(page, per_page.value);
-};
-
 const closeModal = () => {
+  if (loading.value) return;
   showModal.value = false;
 };
 
-const handleCreate = () => {
+const handleDelete = (row) => {
   showModal.value = true;
-  modalTile.value = "Create Category";
-  modalConfirm.value = "Create";
-  color.value = "primary";
-  categoryName.value = "";
+  items.value = row;
 };
 
-const handleEdit = (value) => {
-  isEdit.value = value.id;
-  showModal.value = true;
-  modalTile.value = "Update Category";
-  modalConfirm.value = "Update";
-  color.value = "primary";
-  categoryName.value = value.name;
-};
-
-const handleDelete = (value) => {
-  isDelete.value = value.id;
-  showModal.value = true;
-  modalTile.value = "Delete Category";
-  modalConfirm.value = "Delete";
-  color.value = "danger";
-  categoryName.value = value.name;
-  isDisabled.value = true;
+const goCreateProduct = () => {
+  router.push("/dashboard/createProduct");
 };
 
 onMounted(() => {

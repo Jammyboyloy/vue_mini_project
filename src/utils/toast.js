@@ -7,7 +7,7 @@ export const notify = (router) => {
   return {
     success(text, location) {
       toast.success(text, {
-        position: "bottom-left",
+        position: "bottom-right",
         timeout: 2000,
       });
 
