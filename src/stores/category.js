@@ -12,7 +12,7 @@ export const useCategoryStore = defineStore("category", () => {
   //   hasPreviousPage: false,
   //   hasNextPage: false,
   // });
-
+//Delete Category and Update Category handleDelete handleEdit
   async function fetchCategory() {
     loading.value = true;
     try {
@@ -31,5 +31,16 @@ export const useCategoryStore = defineStore("category", () => {
     }
   }
 
-  return { loading, category, fetchCategory };
+  async function deleteCategory(id) {
+    loading.value = true;
+    try {
+      await api.delete(`/api/categories/${id}`);
+    } catch (err) {
+      console.log(err);
+    }  finally {
+      loading.value = false;
+    }
+  }
+
+  return { loading, category, fetchCategory, deleteCategory };
 });
