@@ -31,12 +31,12 @@
                 </h4>
                 <div class="d-flex gap-3">
                   <h6
-                    class="rounded-4 text-main w-fit bg-cate px-5 align-content-center fs-6 m-0 py-1"
+                    class="rounded-4 text-main w-fit bg-cate-primary px-5 align-content-center fs-6 m-0 py-1"
                   >
                     {{ productDetail?.categories?.[0]?.name }}
                   </h6>
                   <h6
-                    class="rounded-4 text-main w-fit bg-cate px-5 align-content-center fs-6 m-0 py-1"
+                    class="rounded-4 text-main w-fit bg-cate-primary px-5 align-content-center fs-6 m-0 py-1"
                   >
                     {{ productDetail.condition }}
                   </h6>
@@ -48,7 +48,9 @@
               <div>
                 <h5 class="fw-bold mb-3">Quantity</h5>
                 <div class="d-flex gap-2">
-                  <span @click="dec" class="px-4 bg-second py-2 rounded-3 cursor-pointer"
+                  <span
+                    @click="dec"
+                    class="px-4 bg-second py-2 rounded-3 cursor-pointer"
                     ><Minus
                   /></span>
                   <span class="px-5 bg-second py-2 rounded-3 fs-5">{{
@@ -63,10 +65,16 @@
               </div>
 
               <div class="d-flex gap-3">
-                <button @click="handleCart" class="btn bg-btn w-50 btn-lg rounded-5 fw-medium">
+                <button
+                  @click="handleCart"
+                  class="btn bg-btn w-50 btn-lg rounded-5 fw-medium"
+                >
                   Add to Cart
                 </button>
-                <button class="btn bg-btn w-50 btn-lg rounded-5 fw-medium">
+                <button
+                  @click="handleBuyNow"
+                  class="btn bg-btn w-50 btn-lg rounded-5 fw-medium"
+                >
                   Buy now
                 </button>
               </div>
@@ -86,7 +94,7 @@
                           {{ productDetail.creator.name }}
                         </p>
                         <h6
-                          class="rounded-4 text-main w-fit bg-cate py-0 px-3 align-content-center fs-6 m-0"
+                          class="rounded-4 text-main w-fit bg-cate-success py-0 px-3 align-content-center fs-6 m-0"
                         >
                           Owner
                         </h6>
@@ -112,10 +120,11 @@ import api from "@/api/https";
 import DetailSkeleton from "@/components/DetailSkeleton.vue";
 import { useCartStore } from "@/stores/cart";
 import { onMounted, ref } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 
 const route = useRoute();
-const id = route.params.id;
+const router = useRouter();
+const id = Number(route.params.id);
 let loading = ref(false);
 const productDetail = ref({
   categories: [],
@@ -144,6 +153,11 @@ onMounted(() => {
 
 const handleCart = () => {
   cart.addToMyCart(id, qty.value);
+};
+
+const handleBuyNow = () => {
+  cart.addToMyCart(id, qty.value);
+  router.push("/myCart");
 };
 
 const inc = () => {

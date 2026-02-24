@@ -7,7 +7,7 @@
             <li class="nav-item">
               <router-link
                 to="/"
-                class="nav-link fs-6 fw-bold text-uppercase text-dark"
+                class="nav-link fs-6 fw-bold text-uppercase text-dark ls"
                 exact-active-class="text-main"
               >
                 Home
@@ -17,7 +17,7 @@
             <li class="nav-item">
               <router-link
                 to="/shopping"
-                class="nav-link fs-6 fw-bold text-uppercase text-dark"
+                class="nav-link fs-6 fw-bold text-uppercase text-dark ls"
                 exact-active-class="text-main"
               >
                 Shopping
@@ -26,21 +26,26 @@
 
             <li class="nav-item">
               <router-link
-                to="/login"
-                class="nav-link fs-6 fw-bold text-uppercase text-dark"
+                to="/dashboard/createProduct"
+                class="nav-link fs-6 fw-bold text-uppercase text-dark ls"
                 exact-active-class="text-main"
               >
-                Create own product
+                Start Selling
               </router-link>
             </li>
           </ul>
         </div>
         <router-link to="/" class="navbar-brand fw-bold">
-          <img src="../assets/img/logo vue.png" class="" alt="" style="width: 150px; object-fit: contain;">
+          <img
+            src="../assets/img/logo vue.png"
+            class=""
+            alt=""
+            style="width: 150px; object-fit: contain"
+          />
         </router-link>
         <div class="d-flex align-items-center gap-3">
           <OverlayBadge
-            @click="goLogin"
+            @click="goMyCart"
             :value="cart.countProduct"
             severity="danger"
             class="small-badge"
@@ -53,13 +58,22 @@
               class="d-flex align-items-center gap-2"
               style="cursor: pointer"
             >
-              <img
-                src="https://i.pinimg.com/736x/45/29/24/452924175632c9bb3d6d7cea8c4f3746.jpg"
-                class="rounded-circle"
-                width="34"
-                height="34"
-              />
-              <p class="m-0 p-0" style="font-size: 14px">Jammy Lay</p>
+              <template v-if="profile.loading">
+                <div class="skeleton circle"></div>
+                <div class="skeleton text-sm"></div>
+              </template>
+
+              <template v-else>
+                <img
+                  :src="profile.myProfile?.avatar"
+                  class="rounded-circle"
+                  width="34"
+                  height="34"
+                />
+                <p class="m-0 p-0" style="font-size: 14px">
+                  {{ profile.myProfile?.name }}
+                </p>
+              </template>
             </div>
 
             <div class="menu-container">
@@ -100,13 +114,20 @@ import Menu from "primevue/menu";
 import OverlayBadge from "primevue/overlaybadge";
 import { useRouter } from "vue-router";
 import { useCartStore } from "@/stores/cart";
+import { useProfileStore } from "@/stores/profile";
 
 const router = useRouter();
-const goLogin = () => {
-  router.push("/login");
+const goMyCart = () => {
+  router.push("/myCart");
 };
 
 const cart = useCartStore();
+const profile = useProfileStore();
+
+onMounted(() => {
+  cart.fetchMyCart();
+  profile.fetchMyProfile();
+});
 
 const profileItems = [
   {
@@ -166,10 +187,52 @@ const profileItems = [
   margin-bottom: 3px;
 }
 
+.ls {
+  letter-spacing: 1px;
+}
+
 .small-badge :deep(.p-badge) {
   min-width: 18px !important;
   height: 18px !important;
   font-size: 12px !important;
   cursor: pointer;
+}
+
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: #e2e2e2;
+  border-radius: 20px;
+}
+
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    #e2e2e2 25%,
+    #f0f0f0 50%,
+    #e2e2e2 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.2s infinite linear;
+}
+
+.circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+
+.text-sm {
+  width: 60px;
+  height: 12px;
+  border-radius: 8px;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 </style>

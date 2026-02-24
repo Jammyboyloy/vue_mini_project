@@ -15,7 +15,9 @@ import "primeicons/primeicons.css"; // icons
 // npm install @primevue/themes
 import Aura from "@primeuix/themes/aura";
 
-// npm install vue3-lottie@latest --save
+//new 
+// npm install lottie-web vue3-lottie
+// npm install vue-advanced-cropper
 import Vue3Lottie from "vue3-lottie";
 
 import "./assets/main.css";

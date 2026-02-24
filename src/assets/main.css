@@ -63,8 +63,24 @@ body {
   background-color: #f8f9fa;
 }
 
-.bg-cate {
-  background-color: #42b88333; 
+.bg-cate-success {
+  background-color: #42b88333 !important;
+  color: #42b883 !important;
+}
+
+.bg-cate-danger {
+  background-color: #ff4d4d33 !important;
+  color: #ff4d4d !important;
+}
+
+.bg-cate-warning {
+  background-color: #ffcc0033 !important;
+  color: #ffcc00 !important;
+}
+
+.bg-cate-primary {
+  background-color: #3399ff33 !important;
+  color: #3399ff !important;
 }
 
 .w-fit {

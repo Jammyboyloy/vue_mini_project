@@ -8,23 +8,25 @@
     }"
   >
     <div
-      class="author ps-3 pt-2 d-flex justify-content-start align-items-center gap-3 bg-light"
+      class="author ps-3 pt-2 d-flex justify-content-start align-items-center gap-2 bg-light"
     >
-      <img :src="Logo" class="img-fluid" width="30px" alt="" />
-      <div class="d-flex flex-column gap-0 fw-bold">
-        <p class="m-0">Vue {{ product.id }}</p>
-        <p class="m-0">JS</p>
+      <img :src="product.creator?.avatar" class="img-fluid rounded-circle" width="35" height="35" alt="" />
+      <div class="fw-bold pe-7">
+        <p class="m-0">{{ product.creator?.name }}</p>
       </div>
     </div>
-    <div class="item bg-light pt-5 pb-1 px-5" style="height: 280px">
+    <div class="item bg-light pt-5 pb-1 px-5" style="height: 250px">
       <img
         :src="product?.image"
-        class="w-100 h-100 object-fit-contain rounded-5"
+        class="w-100 h-100 object-fit-cover rounded-5"
         alt=""
       />
     </div>
     <div class="detail bg-light py-3">
-      <h6 class="text-center fw-medium">{{ product.title }}</h6>
+      <div class="d-flex justify-content-center flex-column gap-1">
+        <h5 class="text-center fw-medium">{{ product.title }}</h5>
+        <h6 class="text-center fw-bold text-main">US ${{ product.price }}</h6>
+      </div>
       <div class="px-5 d-flex gap-4 justify-content-center mt-3">
         <button
           @click.stop.prevent="$emit('addToCart', product.id)"
@@ -34,7 +36,7 @@
         </button>
         <button
           class="btn bg-btn border-0 w-100 rounded-5 fw-medium"
-          @click.stop.prevent="hello"
+          @click.stop.prevent="$emit('buyNow', product.id)"
         >
           Buy now
         </button>
@@ -57,11 +59,7 @@ defineProps({
   index: Number,
 });
 
-defineEmits(["addToCart"]);
-
-function hello() {
-  alert("hello");
-}
+defineEmits(["addToCart", "buyNow"]);
 </script>
 
 <style scoped>
