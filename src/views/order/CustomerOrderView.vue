@@ -2,8 +2,8 @@
   <div class="container-fluid py-4 bg-white rounded-5 px-4 shadow-sm">
     <div class="d-flex align-items-center justify-content-between mb-5">
       <div class="d-flex align-items-center gap-3">
-        <div class="p-3 bg-light rounded-4">
-          <Store class="text-primary" :size="28" />
+        <div class="p-3 bg-cate-success rounded-4">
+          <ListTodo class="text-main" :size="28" />
         </div>
         <div>
           <h3 class="fw-bold mb-0">Order Actions</h3>
@@ -13,7 +13,7 @@
         </div>
       </div>
       <router-link
-        to="/preview-order"
+        to="/r"
         class="btn btn-primary px-4 rounded-pill fw-bold d-flex align-items-center gap-2"
       >
         View Processed Orders

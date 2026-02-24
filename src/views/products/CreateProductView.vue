@@ -1,7 +1,18 @@
 <template>
-  <div class="container-fluid bg-white rounded-5">
-    <h3 class="fw-semibold text-main text-center pt-5">Create Product</h3>
-    <div class="py-4 px-4">
+  <div class="container-fluid bg-white rounded-5 p-4">
+    <div class="d-flex align-items-center gap-3">
+      <div class="icon-box-title">
+        <LayersPlus class="text-main" :size="28" />
+      </div>
+      <div>
+        <h3 class="fw-bold mb-1">Product Creation</h3>
+        <p class="text-muted mb-0 small">
+          Create and publish a new product to your inventory
+        </p>
+      </div>
+    </div>
+
+    <div class="mt-5 px-2">
       <form @submit.prevent="submitForm">
         <div class="row gy-3 gx-5">
           <div class="col-md-6">
@@ -168,9 +179,14 @@
 
         <button
           type="submit"
-          class="btn bg-btn px-5 d-block ms-auto mt-5 rounded-5 fw-medium text-white shadow-sm"
+          :disabled="loading"
+          class="btn bg-btn py-2 px-5 d-block ms-auto mt-5 rounded-5 fw-medium text-white shadow-sm"
         >
-          Post New Product
+          <span
+            v-if="loading"
+            class="spinner-border spinner-border-sm me-2"
+          ></span>
+          <LayersPlus size="20" class="me-1" />  Publish Product 
         </button>
       </form>
     </div>
@@ -223,7 +239,11 @@ import { useCategoryStore } from "@/stores/category";
 import { ref, onMounted } from "vue";
 import Select from "primevue/select";
 import api from "@/api/https";
-import { LayoutGrid, Eye, Trash2 } from "lucide-vue-next"; // Added missing icon imports
+import { notify } from "@/utils/toast";
+import { useRouter } from "vue-router";
+let router = useRouter();
+let toast = notify(router);
+let loading = ref(false);
 
 const cate = useCategoryStore();
 const fileInput = ref(null);
@@ -278,6 +298,7 @@ function removeFile() {
 }
 
 async function submitForm() {
+  loading.value = true;
   const formData = new FormData();
   formData.append("title", form.value.title);
   formData.append("price", form.value.price);
@@ -293,9 +314,7 @@ async function submitForm() {
   }
 
   try {
-    const response = await api.post("/api/products", formData);
-    console.log("Success:", response.data);
-    alert("Success bro!");
+    const res = await api.post("/api/products", formData);
     form.value = {
       title: "",
       price: "",
@@ -307,17 +326,18 @@ async function submitForm() {
       image: null,
     };
     removeFile();
+    toast.success("Create Product Successfully!", "/dashboard");
   } catch (err) {
     console.error("Upload error:", err.response?.data);
-    alert("Fail bro. Check console for details.");
+  } finally {
+    loading.value = false;
   }
 }
 </script>
 
 <style scoped>
-/* FIX: Fixed height for containers */
 .form-card-height {
-  height: 250px; /* Adjust this value to your preferred fixed height */
+  height: 250px;
 }
 
 .file-title {
@@ -404,5 +424,11 @@ async function submitForm() {
 
 textarea {
   resize: none;
+}
+
+.icon-box-title {
+  background: #f0fff4;
+  padding: 12px;
+  border-radius: 14px;
 }
 </style>

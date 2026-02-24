@@ -20,7 +20,7 @@
           <div :class="`modal-footer border-0 d-flex ${position}`">
             <button
               type="button"
-              class="btn btn-secondary"
+              class="btn btn-secondary rounded-pill px-6 py-2"
               @click="$emit('closeModal')"
             >
               {{ closeText }}
