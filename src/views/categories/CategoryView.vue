@@ -13,6 +13,7 @@
         </div>
       </div>
       <button
+        @click="handleCreate"
         class="btn bg-btn px-4 rounded-pill fw-medium d-flex align-items-center gap-2"
       >
         Create Category
@@ -58,7 +59,7 @@
         </template>
         <template #footer>
           <button
-            :class="`btn btn-${color}`"
+            :class="`btn ${color}`"
             @click="handleAction"
             :disabled="loading"
           >
@@ -82,13 +83,14 @@ import { useCategoryStore } from "@/stores/category";
 import { onMounted, ref } from "vue";
 import BaseInput from "@/components/BaseInput.vue";
 import api from "@/api/https";
+import { useToast } from "vue-toastification";
 let cate = useCategoryStore();
 let per_page = ref(5);
 let columns = [
   { label: "Id", key: "id" },
   { label: "Name", key: "name" },
 ];
-
+let toast = useToast();
 let showModal = ref(false);
 let categoryName = ref("");
 let loading = ref(false);
@@ -96,26 +98,33 @@ let modalTile = ref("");
 let modalConfirm = ref("");
 let isEdit = ref(null);
 let isDelete = ref(null);
-let color = ref("danger");
+let color = ref("bg-btn");
 let isDisabled = ref(false);
 onMounted(async () => {
-  await cate.fetchCategory(1, per_page.value);
-  console.log(cate.category);
-  console.log(cate.pagination);
+  await cate.fetchCategory();
 });
 
+//create category, update category, delete category
 async function handleAction() {
   loading.value = true;
   try {
     if (isEdit.value) {
-      await api.put(`/categories/${isEdit.value}`, {
+      await api.put(`/api/categories/${isEdit.value}`, {
         name: categoryName.value,
       });
+      toast.success("Category updated successfully!");
     } else if (isDelete.value) {
-      await api.delete(`/categories/${isDelete.value}`);
-    } else await api.post("/categories", { name: categoryName.value });
-  } catch (err) {
-    console.log(err);
+      await cate.deleteCategory(isDelete.value);
+      toast.success("Category deleted successfully!");
+    } else {
+      await api.post("/api/categories", {
+        name: categoryName.value,
+      });
+      toast.success("Category created successfully!");
+     
+    }
+  } catch (error) {
+    console.error("Error handling action:", error);
   } finally {
     loading.value = false;
     showModal.value = false;
@@ -124,6 +133,7 @@ async function handleAction() {
     cate.fetchCategory(1, per_page.value);
   }
 }
+
 
 const changePage = (page) => {
   cate.fetchCategory(page, per_page.value);
@@ -137,17 +147,20 @@ const handleCreate = () => {
   showModal.value = true;
   modalTile.value = "Create Category";
   modalConfirm.value = "Create";
-  color.value = "primary";
+  color.value = "bg-btn";
   categoryName.value = "";
+  isDisabled.value = false;
 };
+
 
 const handleEdit = (value) => {
   isEdit.value = value.id;
   showModal.value = true;
   modalTile.value = "Update Category";
   modalConfirm.value = "Update";
-  color.value = "primary";
+  color.value = "bg-btn";
   categoryName.value = value.name;
+  isDisabled.value = false;
 };
 
 const handleDelete = (value) => {
@@ -155,7 +168,7 @@ const handleDelete = (value) => {
   showModal.value = true;
   modalTile.value = "Delete Category";
   modalConfirm.value = "Delete";
-  color.value = "danger";
+  color.value = "btn-danger";
   categoryName.value = value.name;
   isDisabled.value = true;
 };
