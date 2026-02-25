@@ -259,6 +259,7 @@ const form = ref({
   story: "",
   detail: "",
   content: "",
+  description: "",
   image: null,
 });
 
@@ -309,6 +310,7 @@ async function submitForm() {
   formData.append("story", form.value.story);
   formData.append("detail", form.value.detail);
   formData.append("content", form.value.content);
+  formData.append("content", form.value.description);
   if (form.value.image) {
     formData.append("image", form.value.image);
   }
@@ -323,6 +325,7 @@ async function submitForm() {
       story: "",
       detail: "",
       content: "",
+      description: "",
       image: null,
     };
     removeFile();

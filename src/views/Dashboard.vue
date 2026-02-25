@@ -102,6 +102,7 @@
         :column="columns"
         :rows="own.ownProduct"
         @delete="handleDelete"
+        @edit="handleEdit"
       >
         <template #col-image="{ value }">
           <img :src="value" class="rounded-3" width="70" height="70" />
@@ -217,6 +218,10 @@ const closeModal = () => {
 const handleDelete = (row) => {
   showModal.value = true;
   items.value = row;
+};
+
+const handleEdit = (row) => {
+  router.push(`/dashboard/editProduct/${row.id}`);
 };
 
 const goCreateProduct = () => {

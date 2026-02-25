@@ -44,7 +44,14 @@
 
 <script setup>
 import Navbar from "@/components/Navbar.vue";
-import { Store, LayersPlus, LayoutGrid, User, ListTodo, ListChecks } from "lucide-vue-next";
+import {
+  Store,
+  LayersPlus,
+  LayoutGrid,
+  User,
+  ListTodo,
+  ListChecks,
+} from "lucide-vue-next";
 import { ref } from "vue";
 const collapsed = ref(false);
 const toggleSidebar = () => {
@@ -52,6 +59,7 @@ const toggleSidebar = () => {
 };
 
 const menuItems = [
+  { text: "My Profile", path: "/dashboard/myProfile", icon: User },
   { text: "My Product", path: "/dashboard", icon: Store },
   {
     text: "Create Product",
@@ -71,6 +79,11 @@ const menuItems = [
   {
     text: "Preview Order",
     path: "/dashboard/previewOrder",
+    icon: ListChecks,
+  },
+  {
+    text: "My Order",
+    path: "/dashboard/MyOrder",
     icon: ListChecks,
   },
 ];

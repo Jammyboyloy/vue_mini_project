@@ -3,6 +3,7 @@ import { defineStore } from "pinia";
 import { ref } from "vue";
 export const useProductStore = defineStore("product", () => {
   let productList = ref([]);
+  let productDetail = ref({});
   let loading = ref(false);
   async function fetchProduct() {
     loading.value = true;
@@ -17,5 +18,18 @@ export const useProductStore = defineStore("product", () => {
     }
   }
 
-  return { productList, fetchProduct, loading };
+  async function getProductById(id) {
+    loading.value = true;
+    try {
+      const res = await api.get(`/api/products/${id}`);
+      productDetail.value = res.data.data;
+      console.log(res);
+    } catch (err) {
+      console.log(err);
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  return { productList, productDetail, fetchProduct, getProductById, loading };
 });

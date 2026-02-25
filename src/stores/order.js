@@ -5,7 +5,7 @@ import { ref, computed } from "vue";
 export const useOrderStore = defineStore("order", () => {
   const loading = ref(false);
   const orderProduct = ref([]); // Master Data (Array 1)
-
+  const myOrder = ref([]);
   // Array 2: Pending only (Status 1)
   const pendingOrders = computed(() =>
     orderProduct.value.filter((item) => item.status === 1),
@@ -28,13 +28,24 @@ export const useOrderStore = defineStore("order", () => {
     }
   }
 
+  async function fetchMyOrder() {
+    loading.value = true;
+    try {
+      const res = await api.get("/api/profile/payment-check");
+      myOrder.value = res.data.data;
+    } catch (err) {
+      console.error(err);
+    } finally {
+      loading.value = false;
+    }
+  }
+
   async function changeStatus(id, action) {
     try {
       await api.put(`/api/payments/${action}/${id}`);
       await fetchOrder();
-      return { success: true };
     } catch (err) {
-      return { success: false };
+      console.log(err);
     }
   }
 
@@ -43,7 +54,9 @@ export const useOrderStore = defineStore("order", () => {
     orderProduct,
     pendingOrders,
     processedOrders,
+    myOrder,
     fetchOrder,
     changeStatus,
+    fetchMyOrder,
   };
 });

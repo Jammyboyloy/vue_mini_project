@@ -1,94 +1,118 @@
 <template>
   <div>
     <div
-      class="d-flex justify-content-center align-items-center min-vh-100 py-4 shadow-sm"
+      class="d-flex justify-content-center align-items-center min-vh-100 py-4 shadow-sm bg-light"
     >
       <div
         class="container bg-white shadow-sm py-4 px-6 rounded-4 shadow-sm"
         style="width: 500px"
       >
-        <h3 class="text-center text-primary fw-medium mb-3">Create Account</h3>
-        <form @submit.prevent="handleRegister">
-          <label class="form-label my-2">First Name : </label>
-          <div class="position-relative text-secondary mb-2">
-            <input
-              type="text"
-              id="fname"
-              v-model="firstName"
-              class="form-control bg-prime fs-text ps-7"
-              placeholder="Enter your first name"
-            />
-            <i class="bi bi-person position-absolute icon-input tran-y"></i>
-          </div>
-          <p class="p-0 m-0 fs-6 text-danger"></p>
+        <h3 class="text-center text-main fw-medium mb-3">Create Account</h3>
+        <form @submit.prevent="handleLogin">
+          <label class="form-label">Name : </label>
+          <BaseInput
+            input-placeholder="Enter your name"
+            input-icon="User"
+            v-model="name"
+            class="mb-3"
+          />
+          <p v-if="err.email" class="text-danger m-0">{{ err.email }}</p>
 
-          <label class="form-label my-2">Last Name : </label>
-          <div class="position-relative text-secondary mb-2">
-            <input
-              type="text"
-              id="lname"
-              v-model="lastName"
-              class="form-control bg-prime fs-text ps-7"
-              placeholder="Enter your last name"
-            />
-            <i class="bi bi-person position-absolute icon-input tran-y"></i>
-          </div>
-          <p class="p-0 m-0 fs-6 text-danger"></p>
-
-          <label class="form-label my-2">Email : </label>
-          <div class="position-relative text-secondary mb-2">
-            <input
-              type="email"
-              id="email"
-              v-model="email"
-              class="form-control bg-prime fs-text ps-7"
-              placeholder="Enter your email"
-            />
-            <i class="bi bi-envelope position-absolute icon-input tran-y"></i>
-          </div>
-          <p class="p-0 m-0 fs-6 text-danger"></p>
+          <label class="form-label">Email : </label>
+          <BaseInput
+            input-placeholder="Enter your email"
+            input-icon="Mail"
+            v-model="email"
+          />
+          <p v-if="err.email" class="text-danger m-0">{{ err.email }}</p>
 
           <label class="form-label my-2">Password : </label>
           <div class="position-relative text-secondary mb-2">
             <input
-              type="password"
-              id="password"
+              :type="showPassword ? 'text' : 'password'"
               v-model="password"
               class="form-control bg-prime fs-text ps-7"
               placeholder="Enter your password"
             />
-            <i class="bi bi-lock position-absolute icon-input tran-y"></i>
-            <i class="bi bi-eye position-absolute tran-y icon-eye"></i>
+
+            <LockKeyhole
+              size="20"
+              class="position-absolute icon-input tran-y"
+            />
+
+            <Eye
+              v-if="!showPassword"
+              size="20"
+              class="position-absolute icon-eye tran-y cursor-pointer"
+              @click="togglePassword"
+            />
+
+            <EyeOff
+              v-else
+              size="20"
+              class="position-absolute icon-eye tran-y cursor-pointer"
+              @click="togglePassword"
+            />
           </div>
-          <p class="m-0 p-0 fs-6 text-danger"></p>
+          <p v-if="err.password" class="text-danger m-0">
+            {{ err.password }}
+          </p>
 
           <label class="form-label my-2">Confirm Password : </label>
           <div class="position-relative text-secondary mb-2">
             <input
-              type="password"
-              id="cPassword"
-              v-model="confirmPassword"
+              :type="showConfirmPassword ? 'text' : 'password'"
+              v-model="password_confirmation"
               class="form-control bg-prime fs-text ps-7"
-              placeholder="Confirm your password"
+              placeholder="Enter your confirm password"
             />
-            <i class="bi bi-lock position-absolute icon-input tran-y"></i>
-            <i class="bi bi-eye position-absolute tran-y icon-eye"></i>
-          </div>
-          <p class="m-0 p-0 fs-6 text-danger"></p>
 
-          <button class="btn btn-primary text-white w-100 mt-3">
-            Register
+            <LockKeyhole
+              size="20"
+              class="position-absolute icon-input tran-y"
+            />
+
+            <Eye
+              v-if="!showConfirmPassword"
+              size="20"
+              class="position-absolute icon-eye tran-y cursor-pointer"
+              @click="toggleConfirmPassword"
+            />
+
+            <EyeOff
+              v-else
+              size="20"
+              class="position-absolute icon-eye tran-y cursor-pointer"
+              @click="toggleConfirmPassword"
+            />
+          </div>
+          <p v-if="err.password" class="text-danger m-0">
+            {{ err.password }}
+          </p>
+
+          <button
+            :disabled="isLoading"
+            type="submit"
+            class="btn bg-btn border-0 btn-lg w-100 mt-3"
+          >
+            <span
+              v-if="isLoading"
+              class="spinner-border spinner-border-sm me-2 text-white"
+            ></span>
+            <span class="text-white">{{
+              isLoading ? "Signing In..." : "Sign In"
+            }}</span>
           </button>
         </form>
         <div class="d-flex gap-3 mt-3 align-items-center text-secondary">
           <hr class="w-50" />
-          <p class="p-0 m-0 fs-6 text-main">OR</p>
+          <p class="p-0 m-0 fs-6 text-dark">OR</p>
           <hr class="w-50" />
         </div>
-        <p class="m-0 fs-6 mt-2 text-center text-main">
+        <p class="m-0 fs-6 mt-2 text-center text-dark">
           Already have an account?<router-link
             to="/login"
-            class="ms-2 text-primary"
+            class="ms-2 text-main"
             >Login</router-link
           >
         </p>
@@ -99,15 +123,45 @@
 
 <script setup>
 import { useAuthStore } from "@/stores/auth";
-import { ref } from "vue";
+import { ref, reactive } from "vue";
 import { useRouter } from "vue-router";
+import { isEmail, require, validates } from "@/utils/validate";
+import BaseInput from "@/components/BaseInput.vue";
+import { useToast } from "vue-toastification";
+let toast = useToast();
 
 const email = ref("");
-const firstName = ref("");
-const lastName = ref("");
+const name = ref("");
 const password = ref("");
-const confirmPassword = ref("");
+const password_confirmation = ref("");
 const router = useRouter();
+const showPassword = ref(false);
+const showConfirmPassword = ref(false);
+
+const togglePassword = () => {
+  showPassword.value = !showPassword.value;
+};
+
+const toggleConfirmPassword = () => {
+  showConfirmPassword.value = !showConfirmPassword.value;
+};
+
+const err = reactive({
+  email: "",
+  password: "",
+});
+
+function validate() {
+  err.email = validates(email.value, [
+    (v) => require(v, "Email is require"),
+    (v) => isEmail(v, "Wrong Format Email"),
+  ]);
+
+  err.password = require(password.value, "Password is require");
+
+  return !err.email && !err.password;
+}
+
 let auth = useAuthStore();
 
 async function handleRegister() {
@@ -120,7 +174,6 @@ async function handleRegister() {
   );
   router.push("/login");
 }
-
 </script>
 
 <style scoped>

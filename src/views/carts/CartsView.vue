@@ -50,9 +50,9 @@
                 <div class="d-flex align-items-center gap-4">
                   <img
                     :src="pro.product.image"
-                    class="object-fit-contain rounded-3"
-                    width="90"
-                    height="90"
+                    class="object-fit-cover rounded-3"
+                    width="80"
+                    height="80"
                   />
                   <p class="mb-0 fw-bold">{{ pro.product.title }}</p>
                 </div>
