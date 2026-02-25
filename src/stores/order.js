@@ -6,21 +6,70 @@ export const useOrderStore = defineStore("order", () => {
   const loading = ref(false);
   const orderProduct = ref([]); // Master Data (Array 1)
   const myOrder = ref([]);
-  // Array 2: Pending only (Status 1)
+
+  // Keep your original pagination object for other orders
+  const pagination = ref({
+    has_page: true,
+    on_first_page: true,
+    has_more_pages: false,
+    first_item: 1,
+    last_item: 1,
+    total: 0,
+    current_page: 1,
+    last_page: 0,
+  });
+
+  // --- NEW LOGIC FOR PROCESSED PAGINATION ---
+  const processedCurrentPage = ref(1);
+  const itemsPerPage = 5;
+
+  // 1. Get ALL processed from the master list
+  const allProcessed = computed(() =>
+    orderProduct.value.filter((item) => item.status === 2 || item.status === 3)
+  );
+
+  // 2. Filtered list for the table (Status 2 or 3 + sliced)
+  const processedOrders = computed(() => {
+    const start = (processedCurrentPage.value - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    return allProcessed.value.slice(start, end);
+  });
+
+  const processedPaginationUI = computed(() => {
+    const total = allProcessed.value.length;
+    const lastPage = Math.ceil(total / itemsPerPage);
+    const currentPage = processedCurrentPage.value;
+
+    const first = total === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
+    const last = Math.min(currentPage * itemsPerPage, total);
+
+    return {
+      current_page: currentPage,
+      last_page: lastPage,
+      total: total,
+      first_item: first,      
+      last_item: last,        
+      on_first_page: currentPage === 1,
+      has_more_pages: currentPage < lastPage,
+      has_page: lastPage > 1
+    };
+  });
+
   const pendingOrders = computed(() =>
     orderProduct.value.filter((item) => item.status === 1),
   );
 
-  // Array 3: Processed only (Status 2 or 3)
-  const processedOrders = computed(() =>
-    orderProduct.value.filter((item) => item.status === 2 || item.status === 3),
-  );
-
-  async function fetchOrder() {
+  async function fetchOrder(page = 1) {
     loading.value = true;
     try {
-      const res = await api.get("/api/profile/payment-check");
+      const res = await api.get(
+        `/api/profile/payment-check?page=${page}&per_page=100`,
+      );
       orderProduct.value = res.data.data;
+      if (res.data.paginate) {
+        pagination.value = res.data.paginate;
+      }
+      processedCurrentPage.value = 1;
     } catch (err) {
       console.error(err);
     } finally {
@@ -28,11 +77,16 @@ export const useOrderStore = defineStore("order", () => {
     }
   }
 
-  async function fetchMyOrder() {
+  async function fetchMyOrder(page = 1, per_page = 5) {
     loading.value = true;
     try {
-      const res = await api.get("/api/profile/payment-check");
+      const res = await api.get(
+        `/api/profile/payment-check?page=${page}&per_page=${per_page}`,
+      );
       myOrder.value = res.data.data;
+      if (res.data.paginate) {
+        pagination.value = res.data.paginate;
+      }
     } catch (err) {
       console.error(err);
     } finally {
@@ -54,7 +108,10 @@ export const useOrderStore = defineStore("order", () => {
     orderProduct,
     pendingOrders,
     processedOrders,
+    processedPaginationUI, 
+    processedCurrentPage,
     myOrder,
+    pagination,
     fetchOrder,
     changeStatus,
     fetchMyOrder,

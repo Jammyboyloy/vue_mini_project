@@ -1,16 +1,21 @@
 <template>
-  <nav aria-label="Page navigation" class="d-flex align-items-center justify-content-between mt-4 px-2">
+  <nav
+    aria-label="Page navigation"
+    class="d-flex align-items-center justify-content-between mt-4 px-2"
+  >
     <div class="text-secondary small fw-medium">
-      Showing <span class="text-dark">{{ from }}</span> to 
-      <span class="text-dark">{{ to }}</span> of 
-      <span class="text-dark">{{ totalItems }}</span> entries
+      Showing <span class="text-dark">{{ first_item }}</span> to
+      <span class="text-dark">{{ last_item }}</span> of
+      <span class="text-dark">{{ total }}</span> entries
     </div>
 
     <ul class="pagination pagination-modern mb-0">
-      <li class="page-item" :class="{ disabled: !hasPreviousPage }">
+      <li class="page-item me-1" :class="{ disabled: on_first_page }">
         <a
           href="#"
-          @click.prevent="emit('changePage', currentPage - 1)"
+          @click.prevent="
+            !on_first_page && emit('changePage', current_page - 1)
+          "
           class="page-link shadow-sm"
         >
           <i class="bi bi-chevron-left small"></i>
@@ -20,24 +25,26 @@
 
       <li
         class="page-item mx-1"
-        v-for="value in totalPages"
-        :key="value"
-        :class="{ active: value === currentPage }"
+        v-for="page in last_page"
+        :key="page"
+        :class="{ active: page === current_page }"
       >
-        <a 
-          class="page-link rounded-circle border-0 shadow-sm" 
-          @click.prevent="emit('changePage', value)" 
+        <a
+          class="page-link rounded-circle shadow-sm"
+          @click.prevent="emit('changePage', page)"
           href="#"
         >
-          {{ value }}
+          {{ page }}
         </a>
       </li>
 
-      <li class="page-item" :class="{ disabled: !hasNextPage }">
+      <li class="page-item ms-1" :class="{ disabled: !has_more_pages }">
         <a
           class="page-link shadow-sm"
           href="#"
-          @click.prevent="emit('changePage', currentPage + 1)"
+          @click.prevent="
+            has_more_pages && emit('changePage', current_page + 1)
+          "
         >
           <span class="me-1 d-none d-sm-inline">Next</span>
           <i class="bi bi-chevron-right small"></i>
@@ -48,32 +55,18 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
-
 const props = defineProps({
-  totalPages: Number,
-  currentPage: Number,
-  hasNextPage: Boolean,
-  hasPreviousPage: Boolean,
-  totalItems: Number,   
-  itemPerPage: Number  
+  last_page: Number,
+  current_page: Number,
+  has_more_pages: Boolean,
+  on_first_page: Boolean,
+  total: Number,
+  first_item: Number,
+  last_item: Number,
 });
 
 const emit = defineEmits(["changePage"]);
-
-// CALCULATE THE "FROM" NUMBER
-const from = computed(() => {
-  if (props.totalItems === 0) return 0;
-  return (props.currentPage - 1) * props.itemPerPage + 1;
-});
-
-// CALCULATE THE "TO" NUMBER
-const to = computed(() => {
-  const currentMax = props.currentPage * props.itemPerPage;
-  return Math.min(currentMax, props.totalItems);
-});
 </script>
-
 <style scoped>
 .pagination-modern .page-link {
   color: #555;
@@ -95,9 +88,9 @@ const to = computed(() => {
 }
 
 .pagination-modern .page-item.active .page-link {
-  background-color: #0d6efd;
+  background-color: #42b883;
   color: #fff;
-  border-color: #0d6efd;
+  border-color: #42b883;
 }
 
 .pagination-modern .page-item.disabled .page-link {

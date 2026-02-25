@@ -2,7 +2,7 @@
   <div class="container-fluid py-4 bg-white rounded-5 px-4 shadow-sm">
     <div class="d-flex align-items-center justify-content-between mb-5">
       <div class="d-flex align-items-center gap-3">
-        <div class="p-3 bg-cate-success rounded-4">
+        <div class="p-3 bg-icon rounded-4">
           <ListChecks class="text-main" :size="28" />
         </div>
         <div>
@@ -12,12 +12,6 @@
           </p>
         </div>
       </div>
-      <router-link
-        to="/"
-        class="btn btn-outline-secondary px-4 rounded-pill fw-bold"
-      >
-        Back to Home
-      </router-link>
     </div>
 
     <div class="table-responsive">
@@ -82,9 +76,21 @@
               </button>
             </td>
           </tr>
+          <tr v-if="order.myOrder.length === 0 && !order.loading">
+            <td colspan="6" class="text-center py-5 text-muted">
+              All caught up! No pending orders.
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>
+
+    <BasePagination
+      v-if="order.pagination.last_page && order.pagination.last_page > 1"
+      v-bind="order.pagination"
+      :class="{ 'd-none': order.loading }"
+      @changePage="handleChangePage"
+    />
 
     <BaseModal
       v-if="showModal"
@@ -125,6 +131,7 @@
               >US ${{ selectedOrder.price }} x {{ selectedOrder.qty }}</span
             >
           </div>
+
           <div class="col-6 text-end">
             <label class="text-muted small d-block">Total Amount</label>
             <span class="fw-bold text-main fs-5"
@@ -172,6 +179,7 @@
               selectedOrder.seller?.email
             }}</span>
           </div>
+
           <div class="col-6">
             <label class="text-muted small d-block">Seller Name</label>
             <span class="small d-block">{{ selectedOrder.seller?.name }}</span>
@@ -218,14 +226,16 @@
 import { ref, onMounted } from "vue";
 import { useOrderStore } from "@/stores/order";
 import BaseModal from "@/components/BaseModal.vue";
+import BasePagination from "@/components/BasePagination.vue";
 import { ListChecks } from "lucide-vue-next";
 
 const order = useOrderStore();
 const showModal = ref(false);
 const selectedOrder = ref({});
+let per_page = ref(5);
 
 onMounted(() => {
-  order.fetchMyOrder();
+  order.fetchMyOrder(1, per_page.value);
 });
 
 const openDetail = (item) => {
@@ -244,6 +254,10 @@ const statusBadgeClass = (status) => {
   if (status === 1) return base + "bg-cate-warning";
   if (status === 2) return base + "bg-cate-success";
   if (status === 3) return base + "bg-cate-danger";
+};
+
+const handleChangePage = (page) => {
+  order.fetchMyOrder(page, per_page.value);
 };
 
 function formatDate(dateString) {

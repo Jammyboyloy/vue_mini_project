@@ -2,7 +2,7 @@
   <div class="container-fluid py-4 bg-white rounded-5 px-4 shadow-sm">
     <div class="d-flex align-items-center justify-content-between mb-5">
       <div class="d-flex align-items-center gap-3">
-        <div class="p-3 bg-cate-success rounded-4">
+        <div class="p-3 bg-icon rounded-4">
           <ListChecks class="text-main" :size="28" />
         </div>
         <div>
@@ -12,12 +12,6 @@
           </p>
         </div>
       </div>
-      <router-link
-        to="/"
-        class="btn btn-outline-secondary px-4 rounded-pill fw-bold"
-      >
-        Back to Actions
-      </router-link>
     </div>
 
     <div class="table-responsive">
@@ -90,6 +84,13 @@
         </tbody>
       </table>
     </div>
+
+    <BasePagination
+      v-if="order.processedPaginationUI.last_page > 1"
+      v-bind="order.processedPaginationUI"
+      :class="{ 'd-none': order.loading }"
+      @changePage="handleChangePage"
+    />
 
     <BaseModal
       v-if="showModal"
@@ -226,7 +227,8 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useOrderStore } from "@/stores/order";
-import BaseModal from "@/components/BaseModal.vue"; // Adjust path to your modal component
+import BaseModal from "@/components/BaseModal.vue"; 
+import BasePagination from "@/components/BasePagination.vue";
 
 const order = useOrderStore();
 const showModal = ref(false);
@@ -235,6 +237,10 @@ const selectedOrder = ref({});
 onMounted(() => {
   order.fetchOrder();
 });
+
+const handleChangePage = (page) => {
+  order.processedCurrentPage = page;
+};
 
 const openDetail = (item) => {
   selectedOrder.value = item;
@@ -265,4 +271,15 @@ function formatDate(dateString) {
   background-color: #6c757d;
 }
 
+.extra-small {
+  font-size: 0.7rem;
+}
+
+.table thead th {
+  font-size: 0.8rem;
+  letter-spacing: 0.5px;
+  color: #6c757d;
+  padding: 15px 10px;
+  text-transform: uppercase;
+}
 </style>

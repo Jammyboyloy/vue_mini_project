@@ -3,8 +3,9 @@
     <nav :class="['sidebar', collapsed ? 'collapsed' : '']">
       <div class="sidebar-header">
         <div class="brand" :class="{ 'brand-visible': !collapsed }">
-          <i class="bi bi-lightning-charge-fill me-2"></i>
-          <span>NEXUS</span>
+          <router-link to="/">
+            <img src="../assets/img/logo vue2.png" alt="" class="object-fit-contain" style="width: 150px;">
+          </router-link>
         </div>
         <button class="toggle-btn" @click="toggleSidebar">
           <i
@@ -51,6 +52,7 @@ import {
   User,
   ListTodo,
   ListChecks,
+  ShoppingBag,
 } from "lucide-vue-next";
 import { ref } from "vue";
 const collapsed = ref(false);
@@ -59,8 +61,8 @@ const toggleSidebar = () => {
 };
 
 const menuItems = [
-  { text: "My Profile", path: "/dashboard/myProfile", icon: User },
   { text: "My Product", path: "/dashboard", icon: Store },
+  { text: "My Profile", path: "/dashboard/myProfile", icon: User },
   {
     text: "Create Product",
     path: "/dashboard/createProduct",
@@ -84,7 +86,7 @@ const menuItems = [
   {
     text: "My Order",
     path: "/dashboard/MyOrder",
-    icon: ListChecks,
+    icon: ShoppingBag,
   },
 ];
 </script>
@@ -120,19 +122,14 @@ const menuItems = [
   align-items: center;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   position: relative;
-  padding: 0 15px;
 }
 
 .brand {
-  font-weight: 800;
-  font-size: 1.1rem;
-  color: #42b883;
   white-space: nowrap;
   transition:
     opacity 0.2s ease,
     transform 0.3s ease;
   opacity: 0;
-  transform: translateX(-10px);
 }
 
 .brand-visible {
