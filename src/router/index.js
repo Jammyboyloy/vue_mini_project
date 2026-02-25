@@ -48,6 +48,11 @@ const router = createRouter({
       component: () => import("../views/profile/ProfileView.vue"),
     },
     {
+      path: "/receipt",
+      name: "receipt",
+      component: () => import("../views/payments/ReceiptView.vue"),
+    },
+    {
       path: "/dashboard",
       component: () => import("../layouts/DashboardLayout.vue"),
       children: [
