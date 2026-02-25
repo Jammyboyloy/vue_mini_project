@@ -1,34 +1,95 @@
 <template>
-  <div>
-    <Navbar />
-    <div class="container py-5 px-10 rounded-5" style="background-color: rgb(235, 235, 235);">
+    <div>
+        <div class="container-fluid py-4 bg-white rounded-5 px-4 shadow-sm">
             <h5 class="ms-7">My Profile</h5>
             <div class="d-flex align-content-center bg-light rounded-5 px-5">
                 <div class="col-lg-6">
                     <div class="d-flex pb-3">
-                        <div class="profile-img-wrapper me-3 mt-3">
-                            <img src="https://media.istockphoto.com/id/1300845620/vector/user-icon-flat-isolated-on-white-background-user-symbol-vector-illustration.jpg?s=612x612&w=0&k=20&c=yBeyba0hUkh14_jgv1OKqIH0CCSWU_4ckRkAoy2p73o="
-                                class="profile-img" />
+                        <div class="border-0 me-4 mt-3">
+                            <div class="position-relative mx-auto" style="width: 150px; height: 150px;">
+                                <img id="avatar" :src="MyProfileStore.myProfile?.avatar"
+                                    class="rounded-circle border w-100 h-100" alt="" />
+                                <div class="dropdown position-absolute bg-main rounded-circle"
+                                    style="bottom: 35px; right: -9px;">
+                                    <span
+                                        class="d-flex justify-content-center align-items-center bg-btn text-white rounded-circle"
+                                        data-bs-toggle="dropdown" style="width: 30px; height: 30px; cursor: pointer;">
+                                        <i class="bi bi-pencil fs-6"></i>
+                                    </span>
 
-                            <!-- icon -->
-                            <div class="camera-overlay-half">
-                                <camera/>
+                                    <ul class="dropdown-menu px-2 bg-main border">
+                                        <li>
+                                            <input type="file" id="uploadImage" @change="handleFile" accept="image/*"
+                                                style="display: none;">
+                                            <label for="uploadImage" class="btn dropdown-item mb-1 nav-text">
+                                                <i class="bi bi-camera-fill me-2"></i> Change Profile
+                                            </label>
+                                        </li>
+                                        <li>
+                                            <button class="btn dropdown-item nav-text" type="button"
+                                                data-bs-toggle="modal" data-bs-target="#removeAvatar"
+                                                @click="removeAvatar">
+                                                <i class="bi bi-trash text-danger me-2"></i> Remove
+                                                Profile
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="mt-4">
-                            <h4>{{ name }}</h4>
+                        <div class="mt-8">
+                            <h4>{{ MyProfileStore.myProfile?.name }}</h4>
                             <div class="lh-1 mt-3">
-                                <p><span class="text-muted">Email:</span> {{email}}</p>
-                                <p><span class="text-muted">Created At:</span> {{created_at}}</p>
+                                <p><span class="text-muted">Email:</span> {{ MyProfileStore.myProfile?.email }}
+                                </p>
+                                <p><span class="text-muted">Created At:</span> {{
+                                    MyProfileStore.myProfile?.created_at }}
+                                </p>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-6">
-                    <div class="d-flex justify-content-end mt-8">
-                        <a href="asset/page/profile.html" class="btn bg-btn rounded-5 me-3">Edit Profile</a>
-                        <a href="#" class="btn btn-danger rounded-5">Sign out</a>
+                    <div class="d-flex justify-content-end mt-10">
+                        <a href="#" class="btn bg-btn  rounded-pill py-2 px-6 me-3" @click="editModal">Edit Profile</a>
+                        <a href="#" class="btn btn-danger  rounded-pill py-2 px-6" @click="toggleModal">Sign out</a>
+                        <BaseModal v-if="open" @closeModal="toggleModal" position="justify-content-center">
+                            <template #header>
+                                <h5 class="modal-title mx-auto">Sign out</h5>
+                            </template>
+                            <template #body>
+                                <p class="text-center mb-0">Are you sure you want to sign out?</p>
+                            </template>
+                            <template #footer>
+                                <button type="button" class="btn btn-danger">Sign out</button>
+                            </template>
+                        </BaseModal>
+                        <BaseModal v-if="edit" @closeModal="editModal">
+                            <template #header>
+                                <h5 class="modal-title mx-auto">Edit Profile</h5>
+                            </template>
+                            <template #body>
+                                <label for="name" class="mb-2">Name</label>
+                                <BaseInput inputPlaceholder="Enter your name" inputIcon="User"
+                                    v-model="editProfile.name"></BaseInput>
+                                <label for="email" class="mb-2">Email</label>
+                                <BaseInput inputPlaceholder="Enter your email" inputIcon="Mail"
+                                    v-model="editProfile.email"></BaseInput>
+                                <label for="location" class="mb-2">Location</label>
+                                <BaseInput inputPlaceholder="Enter your location" inputIcon="MapPin"
+                                    v-model="editProfile.location"></BaseInput>
+                                <label for="phone" class="mb-2">Phone</label>
+                                <BaseInput inputPlaceholder="Enter your phone" inputIcon="Phone"
+                                    v-model="editProfile.phone"></BaseInput>
+                            </template>
+                            <template #footer>
+                                <button type="button" class="btn bg-btn text-white rounded-pill py-2 px-6" @click="UpdateProfile" :disabled="Loading">
+                                    <span v-if="Loading" class="spinner-border spinner-border-sm me-2"></span>
+                                    Update
+                                </button>
+                            </template>
+                        </BaseModal>
                     </div>
                 </div>
             </div>
@@ -39,15 +100,15 @@
                         <ul class="timeline">
                             <li>
                                 <span class="text-gray">Full Name</span>
-                                <p class=" fs-5 fw-bold">{{ name }}</p>
+                                <p class=" fs-5 fw-bold">{{ MyProfileStore.myProfile.name }}</p>
                             </li>
                             <li>
                                 <span class="text-gray">Email</span>
-                                <p class="fw-bold fs-5">{{ email }}</p>
+                                <p class="fw-bold fs-5">{{ MyProfileStore.myProfile.email }}</p>
                             </li>
                             <li>
                                 <span class="text-gray">Address</span>
-                                <p class="fw-bold fs-5">{{ location }}</p>
+                                <p class="fw-bold fs-5">{{ MyProfileStore.myProfile.location }}</p>
                             </li>
                         </ul>
                     </div>
@@ -55,129 +116,179 @@
                         <ul class="mt-11 timeline">
                             <li>
                                 <span class="text-gray">Email</span>
-                                <p class="fw-bold fs-5">{{ email }}</p>
+                                <p class="fw-bold fs-5">{{ MyProfileStore.myProfile.email }}</p>
                             </li>
                             <li>
                                 <span class="text-gray">ID</span>
-                                <p class="fw-bold fs-5">{{ id }}</p>
+                                <p class="fw-bold fs-5">{{ MyProfileStore.myProfile.id }}</p>
                             </li>
                             <li>
                                 <span class="text-gray">Phone Number</span>
-                                <p class="fw-bold fs-5">{{ phone }}</p>
+                                <p class="fw-bold fs-5">{{ MyProfileStore.myProfile.phone }}</p>
                             </li>
                         </ul>
                     </div>
                 </div>
             </div>
         </div>
-  </div>
+    </div>
 </template>
 
 <script setup>
-import Navbar from '@/components/Navbar.vue';
 import { useProfileStore } from '@/stores/profile';
 import { onMounted, ref } from 'vue';
+import BaseModal from '@/components/BaseModal.vue';
+import BaseInput from '@/components/BaseInput.vue';
+import api from '@/api/https';
+import { useToast } from 'vue-toastification';
 
-let profileStore = useProfileStore();
-let phone = ref('');
-let name = ref('');
-let email = ref('');
-let location = ref('');
-let created_at = ref('');
-let id = ref('');
+let MyProfileStore = useProfileStore();
+let open = ref(false);
+let edit = ref(false);
+let file = ref(null);
+let toast = useToast();
+let editProfile = ref({
+    name: "",
+    email: "",
+    location: "",
+    phone: "",
+});
 
-onMounted (async () => {
-    await profileStore.fetchProfile();
-    phone.value = profileStore.phone;
-    name.value = profileStore.name;
-    email.value = profileStore.email;
-    location.value = profileStore.location;
-    created_at.value = profileStore.created_at;
-    id.value = profileStore.id;
+onMounted(async () => {
+    await MyProfileStore.fetchMyProfile();
+    editProfile.value = MyProfileStore.myProfile;
 })
+
+function toggleModal() {
+    open.value = !open.value;
+}
+
+function editModal() {
+    edit.value = !edit.value;
+}
+
+let Loading = ref(false);
+
+// async function UpdateImage() {
+//     Loading.value = true;
+//     try {
+//         if (file.value) {
+//             let formData = new FormData();
+//             formData.append('image', file.value);
+
+//             await api.post('/api/profile/image', formData, {
+//                 headers: {
+//                     Accept: 'application/json',
+//                 },
+//             });
+//         }
+//     } catch (error) {
+//         console.error(error.response?.data || error);
+//         toast.error("Upload failed");
+//     } finally {
+//         Loading.value = false;
+//         edit.value = false;
+//     }
+//     await MyProfileStore.fetchMyProfile();
+// }
+
+
+async function UpdateProfile() {
+    Loading.value = true;
+    try {
+        if (file.value) {
+            let formData = new FormData();
+            formData.append('image', file.value);
+
+            await api.post('/api/profile/image', formData, {
+                headers: {
+                    Accept: 'application/json',
+                },
+            });
+        }
+        await api.put('/api/profile/info', editProfile.value);
+
+        toast.success("Profile updated successfully", { timeout: 1500 });
+    } catch (error) {
+        console.error(error.response?.data || error);
+        toast.error("Upload failed");
+    } finally {
+        Loading.value = false;
+        edit.value = false;
+    }
+    await MyProfileStore.fetchMyProfile();
+}
+
+async function removeAvatar() {
+    try {
+        Loading.value = true;
+
+        await api.delete('/api/profile/image', {
+            headers: {
+                Accept: 'application/json',
+            },
+        });
+
+        toast.success('Profile image removed', { timeout: 1500 });
+
+        // refresh profile
+        await MyProfileStore.fetchMyProfile();
+    } catch (error) {
+        console.error(error.response?.data || error);
+        toast.error('Failed to remove profile image');
+    } finally {
+        Loading.value = false;
+    }
+}
+
+const handleFile = (event) => {
+    let selectFile = event.target.files[0];
+    console.log(selectFile)
+    if (selectFile) {
+        file.value = selectFile;
+    }
+}
 
 
 </script>
 
 <style scoped>
 ul.timeline {
-  list-style-type: none;
-  position: relative;
+    list-style-type: none;
+    position: relative;
 }
 
 ul.timeline:before {
-  content: " ";
-  background: #d4d9df;
-  display: inline-block;
-  position: absolute;
-  left: 29px;
-  width: 2px;
-  height: 100%;
-  z-index: 400;
+    content: " ";
+    background: #d4d9df;
+    display: inline-block;
+    position: absolute;
+    left: 29px;
+    width: 2px;
+    height: 100%;
+    z-index: 400;
 }
 
 ul.timeline>li {
-  margin: 20px 0;
-  padding-left: 30px;
+    margin: 20px 0;
+    padding-left: 30px;
 }
 
 ul.timeline>li:before {
-  content: " ";
-  background: white;
-  display: inline-block;
-  position: absolute;
-  border-radius: 50%;
-  border: 3px solid var(--bs-dark);
-  left: 20px;
-  width: 20px;
-  height: 20px;
-  z-index: 400;
+    content: " ";
+    background: white;
+    display: inline-block;
+    position: absolute;
+    border-radius: 50%;
+    border: 3px solid var(--bs-dark);
+    left: 20px;
+    width: 20px;
+    height: 20px;
+    z-index: 400;
 }
 
 .text-gray {
-  color: rgb(112, 112, 112) !important;
-  font-size: 14px;
-}
-
-/* profile */
-
-.profile-img-wrapper {
-  position: relative;
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  overflow: hidden;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-
-.profile-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* bottom half overlay circle */
-.camera-overlay-half {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 40%;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 26px;
-  opacity: 0;
-  transform: translateY(100%);
-  transition: 0.3s ease;
-}
-
-/* hover */
-.profile-img-wrapper:hover .camera-overlay-half {
-  opacity: 1;
-  transform: translateY(0);
+    color: rgb(112, 112, 112) !important;
+    font-size: 14px;
 }
 </style>
