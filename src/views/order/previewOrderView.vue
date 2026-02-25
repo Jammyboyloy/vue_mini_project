@@ -22,8 +22,12 @@
 
     <div class="table-responsive">
       <div v-if="order.loading" class="text-center py-5">
-        <div class="spinner-border text-primary" role="status"></div>
-        <p class="mt-2 text-muted small">Loading history...</p>
+        <div class="loader">
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </div>
+        <p class="mt-3 text-muted small">Loading history...</p>
       </div>
 
       <table v-else class="table table-hover align-middle">
@@ -257,22 +261,8 @@ function formatDate(dateString) {
 </script>
 
 <style scoped>
-.bg-cate-success {
-  background-color: #f0fff4 !important;
-  color: #42b883 !important;
+.bar {
+  background-color: #6c757d;
 }
-.bg-cate-danger {
-  background-color: #ff4d4d33 !important;
-  color: #ff4d4d !important;
-}
-.extra-small {
-  font-size: 0.7rem;
-}
-.table thead th {
-  font-size: 0.8rem;
-  letter-spacing: 0.5px;
-  color: #6c757d;
-  padding: 15px 10px;
-  text-transform: uppercase;
-}
+
 </style>

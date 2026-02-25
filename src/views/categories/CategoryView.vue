@@ -7,9 +7,7 @@
         </div>
         <div>
           <h3 class="fw-bold mb-0">Category</h3>
-          <p class="text-muted mb-0 small">
-            Total Category :  
-          </p>
+          <p class="text-muted mb-0 small">Total Category :</p>
         </div>
       </div>
       <button
@@ -22,8 +20,12 @@
 
     <div class="table-responsive">
       <div v-if="cate.loading" class="text-center py-5">
-        <div class="spinner-border text-primary" role="status"></div>
-        <p class="mt-2 text-muted small">Fetching pending data...</p>
+        <div class="loader">
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </div>
+        <p class="mt-3 text-muted small">Loading category...</p>
       </div>
 
       <BaseTable
@@ -121,7 +123,6 @@ async function handleAction() {
         name: categoryName.value,
       });
       toast.success("Category created successfully!");
-     
     }
   } catch (error) {
     console.error("Error handling action:", error);
@@ -133,7 +134,6 @@ async function handleAction() {
     cate.fetchCategory(1, per_page.value);
   }
 }
-
 
 const changePage = (page) => {
   cate.fetchCategory(page, per_page.value);
@@ -151,7 +151,6 @@ const handleCreate = () => {
   categoryName.value = "";
   isDisabled.value = false;
 };
-
 
 const handleEdit = (value) => {
   isEdit.value = value.id;
@@ -174,4 +173,8 @@ const handleDelete = (value) => {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.bar {
+  background-color: #6c757d;
+}
+</style>
