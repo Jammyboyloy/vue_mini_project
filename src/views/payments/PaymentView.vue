@@ -218,7 +218,8 @@
                                         </div>
                                     </template>
                                 </div>
-                                <span v-if="err.address || err.google_map_url " class="text-danger d-block mt-1" style="font-size: 0.8rem">
+                                <span v-if="err.address || err.google_map_url" class="text-danger d-block mt-1"
+                                    style="font-size: 0.8rem">
                                     {{ err.address }} {{ err.google_map_url }}
                                 </span>
                                 <!-- <span v-if="err.google_map_url" class="text-danger d-block mt-1"
@@ -366,14 +367,108 @@
             </div>
         </div>
     </form>
+    <BaseModal v-if="showModal" @closeModal="showModal = false" closeText="Close" position="justify-content-end">
+        <template #header>
+            <h5 class="fw-bold mb-0">Order Detail #{{ selectedOrder.id }}</h5>
+        </template>
+
+        <template #body>
+            <div class="row g-3">
+                <div class="col-12 border-bottom pb-3">
+                    <div class="d-flex gap-3 align-items-start">
+                        <img :src="selectedOrder.product?.image" class="rounded-3" width="80" height="80"
+                            style="object-fit: cover" />
+                        <div>
+                            <h6 class="fw-bold mb-1">{{ selectedOrder.product?.title }}</h6>
+                            <p class="text-muted small mb-0 mt-2">
+                                {{ formatDate(selectedOrder?.created_at) }}
+                            </p>
+                            <p class="badge bg-light text-dark border small mt-2">
+                                Condition : {{ selectedOrder.product?.condition }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-6">
+                    <label class="text-muted small d-block">Price x Qty</label>
+                    <span class="fw-semibold">US ${{ selectedOrder.price }} x {{ selectedOrder.qty }}</span>
+                </div>
+                <div class="col-6 text-end">
+                    <label class="text-muted small d-block">Total Amount</label>
+                    <span class="fw-bold text-main fs-5">US ${{ selectedOrder.price * selectedOrder.qty }}</span>
+                </div>
+
+                <div class="col-12 bg-light p-3 rounded-4">
+                    <div class="row">
+                        <div class="col-6">
+                            <label class="text-muted extra-small d-block">Delivery Status</label>
+                            <span class="small fw-bold">
+                                {{
+                                    selectedOrder.is_delivery === 2
+                                        ? "🚚 Delivery Required"
+                                        : "🏠 Self Pickup"
+                                }}
+                            </span>
+                        </div>
+                        <div class="col-6 text-end" v-if="selectedOrder.google_map_url">
+                            <a :href="selectedOrder.google_map_url" target="_blank"
+                                class="btn btn-sm bg-btn text-white rounded-pill px-3">
+                                View Map
+                            </a>
+                        </div>
+                        <div class="col-12 mt-2" v-if="selectedOrder.address">
+                            <label class="text-muted extra-small d-block">Address</label>
+                            <p class="small mb-0">{{ selectedOrder.address }}</p>
+                        </div>
+                        <div class="col-12 mt-2" v-if="selectedOrder.address">
+                            <label class="text-muted extra-small d-block">Phone</label>
+                            <p class="small mb-0">{{ selectedOrder?.phone ?? "N/A" }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-6">
+                    <label class="text-muted small d-block">Buyer Email</label>
+                    <span class="small">{{ selectedOrder.buyer?.email }}</span>
+                </div>
+                <div class="col-6">
+                    <label class="text-muted small d-block">Buyer Name</label>
+                    <span class="small">{{ selectedOrder.buyer?.name }}</span>
+                </div>
+
+                <div class="col-12 mt-3">
+                    <label class="text-muted small d-block mb-2 fw-bold text-uppercase"
+                        style="font-size: 0.65rem; letter-spacing: 0.5px">
+                        Payment Receipt
+                    </label>
+
+
+                    <div v-if="selectedOrder.transaction_file">
+                        <div
+                            class="d-flex flex-column align-items-center gap-1 py-2 border shadow-sm rounded-4 bg-light">
+                            <div class="extra-small fw-bold text-dark">Receipt Image</div>
+                            <a :href="selectedOrder.transaction_file" target="_blank">
+                                <img :src="selectedOrder.transaction_file" class="rounded-3 border shadow-sm" style="width: 60px;height: 60px;object-fit: cover;transition: transform 0.2s;" />
+                            </a>
+                        </div>
+                    </div>
+
+                    <div v-else class="p-3 border border-dashed rounded-4 text-center bg-light">
+                        <span class="text-muted extra-small italic">No receipt provided for this order</span>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </BaseModal>
+
 </template>
 <script setup>
 import api from "@/api/https";
 import { useCartStore } from "@/stores/cart";
-import { notify } from "@/utils/toast";
 import { checkContent, checkFileSize, validates, require } from "@/utils/validate";
 import { ref, computed, onUnmounted, watch, onMounted, reactive } from "vue";
-// import { v, V } from "vue-router/dist/index-Cu9B0wDz.mjs";
+import { useToast } from "vue-toastification";
 
 const cartStore = useCartStore();
 
@@ -452,7 +547,7 @@ const parseFile = (file) => {
     txn.value.transaction_file = file.name;
     txn.value.file_size = `${(file.size / 1024).toFixed(0)} KB · ${ext}`;
     txn.value.file_object = file;
-    err.value.transaction_file = "";
+    // err.value.transaction_file = "";
 
     justUploaded.value = true;
     setTimeout(() => (justUploaded.value = false), 3000);
@@ -477,7 +572,7 @@ const onInput = () => {
     txn.value.google_map_url = val
         ? `https://maps.google.com/maps?q=${encodeURIComponent(val)}`
         : "";
-    err.value.address = "";
+    // err.value.address = "";
 };
 
 const confirmPlace = () => {
@@ -502,7 +597,7 @@ const switchMethod = (val) => {
     localPlace.value = "";
     isEditing.value = true;
     txn.value.address = "";
-    err.value.is_delivery = "";
+    // err.value.is_delivery = "";
     txn.value.google_map_url = "";
 };
 
@@ -594,6 +689,8 @@ function validate() {
     return !err.transaction_file && !err.address && !err.google_map_url && !err.is_delivery
 }
 
+const toast = useToast();
+
 const saveCheckout = async () => {
     if (!validate()) return;
 
@@ -612,6 +709,8 @@ const saveCheckout = async () => {
 
         const res = await api.post("/api/carts/checkout", form);
         console.log("Success:", res.data);
+        // toast.succes(res.data)
+        toast.success("Checkout Successfully!");
     } catch (err) {
         console.error(err);
         toast.error(err.message);
