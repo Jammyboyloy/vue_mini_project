@@ -6,9 +6,9 @@
           <ListChecks class="text-main" :size="28" />
         </div>
         <div>
-          <h3 class="fw-bold mb-0">Processed Orders</h3>
+          <h3 class="fw-bold mb-0">My Orders</h3>
           <p class="text-muted mb-0 small">
-            History Count: {{ order.processedOrders.length }}
+            Total Orders: {{ order.myOrder.length }}
           </p>
         </div>
       </div>
@@ -16,21 +16,21 @@
         to="/"
         class="btn btn-outline-secondary px-4 rounded-pill fw-bold"
       >
-        Back to Actions
+        Back to Home
       </router-link>
     </div>
 
     <div class="table-responsive">
       <div v-if="order.loading" class="text-center py-5">
         <div class="spinner-border text-primary" role="status"></div>
-        <p class="mt-2 text-muted small">Loading history...</p>
+        <p class="mt-2 text-muted small">Loading your orders...</p>
       </div>
 
       <table v-else class="table table-hover align-middle">
         <thead class="bg-light">
           <tr>
             <th class="border-0 ps-4">Product Info</th>
-            <th class="border-0">Buyer</th>
+            <th class="border-0">Seller</th>
             <th class="border-0">Amount</th>
             <th class="border-0 text-center">Status</th>
             <th class="border-0 text-end pe-4">Actions</th>
@@ -38,7 +38,7 @@
         </thead>
         <tbody>
           <tr
-            v-for="item in order.processedOrders"
+            v-for="item in order.myOrder"
             :key="item.id"
             class="border-bottom"
           >
@@ -58,7 +58,7 @@
               </div>
             </td>
             <td>
-              <div class="small fw-semibold">{{ item.buyer?.name }}</div>
+              <div class="small fw-semibold">{{ item.seller?.name }}</div>
             </td>
             <td>
               <div class="fw-bold text-dark">US ${{ item.price }}</div>
@@ -66,7 +66,7 @@
             </td>
             <td class="text-center">
               <span :class="statusBadgeClass(item.status)">
-                {{ item.status === 2 ? "Approved" : "Rejected" }}
+                {{ getStatusText(item.status) }}
               </span>
             </td>
             <td class="pe-4 text-end">
@@ -76,11 +76,6 @@
               >
                 Detail
               </button>
-            </td>
-          </tr>
-          <tr v-if="order.processedOrders.length === 0 && !order.loading">
-            <td colspan="6" class="text-center py-5 text-muted">
-              All caught up! No pending orders.
             </td>
           </tr>
         </tbody>
@@ -103,7 +98,7 @@
             <div class="d-flex gap-3 align-items-start">
               <img
                 :src="selectedOrder.product?.image"
-                class="rounded-3"
+                class="rounded-3 shadow-sm"
                 width="80"
                 height="80"
                 style="object-fit: cover"
@@ -113,7 +108,7 @@
                 <p class="text-muted small mb-0 mt-2">
                   Ordered : {{ formatDate(selectedOrder?.created_at) }}
                 </p>
-                <p class="badge bg-light text-dark border small mt-2">
+                <p class="badge bg-light text-dark border small mt-2 mb-0">
                   Condition : {{ selectedOrder.product?.condition }}
                 </p>
               </div>
@@ -168,12 +163,14 @@
           </div>
 
           <div class="col-6">
-            <label class="text-muted small d-block">Buyer Email</label>
-            <span class="small">{{ selectedOrder.buyer?.email }}</span>
+            <label class="text-muted small d-block">Seller Email</label>
+            <span class="small text-truncate d-block">{{
+              selectedOrder.seller?.email
+            }}</span>
           </div>
           <div class="col-6">
-            <label class="text-muted small d-block">Buyer Name</label>
-            <span class="small">{{ selectedOrder.buyer?.name }}</span>
+            <label class="text-muted small d-block">Seller Name</label>
+            <span class="small d-block">{{ selectedOrder.seller?.name }}</span>
           </div>
 
           <div class="col-12 mt-3">
@@ -181,7 +178,7 @@
               class="text-muted small d-block mb-2 fw-bold text-uppercase"
               style="font-size: 0.65rem; letter-spacing: 0.5px"
             >
-              Payment Receipt
+              Your Payment Receipt
             </label>
 
             <div v-if="selectedOrder.transaction_file">
@@ -192,13 +189,7 @@
                 <a :href="selectedOrder.transaction_file" target="_blank">
                   <img
                     :src="selectedOrder.transaction_file"
-                    class="rounded-3 border shadow-sm"
-                    style="
-                      width: 60px;
-                      height: 60px;
-                      object-fit: cover;
-                      transition: transform 0.2s;
-                    "
+                    class="rounded-3 border shadow-sm receipt-preview"
                   />
                 </a>
               </div>
@@ -209,7 +200,7 @@
               class="p-3 border border-dashed rounded-4 text-center bg-light"
             >
               <span class="text-muted extra-small italic"
-                >No receipt provided for this order</span
+                >No receipt uploaded</span
               >
             </div>
           </div>
@@ -222,14 +213,15 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useOrderStore } from "@/stores/order";
-import BaseModal from "@/components/BaseModal.vue"; // Adjust path to your modal component
+import BaseModal from "@/components/BaseModal.vue";
+import { ListChecks } from "lucide-vue-next";
 
 const order = useOrderStore();
 const showModal = ref(false);
 const selectedOrder = ref({});
 
 onMounted(() => {
-  order.fetchOrder();
+  order.fetchMyOrder();
 });
 
 const openDetail = (item) => {
@@ -237,22 +229,27 @@ const openDetail = (item) => {
   showModal.value = true;
 };
 
+const getStatusText = (status) => {
+  if (status === 1) return "Pending";
+  if (status === 2) return "Approved";
+  if (status === 3) return "Rejected";
+};
+
 const statusBadgeClass = (status) => {
   const base = "badge rounded-pill px-3 py-2 fw-medium ";
+  if (status === 1) return base + "bg-cate-warning";
   if (status === 2) return base + "bg-cate-success";
   if (status === 3) return base + "bg-cate-danger";
 };
 
 function formatDate(dateString) {
+  if (!dateString) return "N/A";
   const date = new Date(dateString);
-
-  const options = {
+  return date.toLocaleDateString("en-US", {
     month: "short",
     day: "2-digit",
     year: "numeric",
-  };
-
-  return date.toLocaleDateString("en-US", options);
+  });
 }
 </script>
 
@@ -262,17 +259,36 @@ function formatDate(dateString) {
   color: #42b883 !important;
 }
 .bg-cate-danger {
-  background-color: #ff4d4d33 !important;
-  color: #ff4d4d !important;
+  background-color: #fff5f5 !important;
+  color: #ff4d4f !important;
+}
+.bg-cate-warning {
+  background-color: #fffbe6 !important;
+  color: #faad14 !important;
+}
+.text-main {
+  color: #42b883;
+}
+.bg-btn {
+  background-color: #42b883;
 }
 .extra-small {
   font-size: 0.7rem;
 }
 .table thead th {
   font-size: 0.8rem;
-  letter-spacing: 0.5px;
   color: #6c757d;
   padding: 15px 10px;
   text-transform: uppercase;
 }
+
+.receipt-preview {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  transition: transform 0.4s;
+}
+/* .receipt-preview:hover {
+  transform: scale(1.05);
+} */
 </style>

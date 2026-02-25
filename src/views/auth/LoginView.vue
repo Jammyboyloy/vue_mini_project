@@ -68,7 +68,7 @@
         </div>
         <p class="m-0 fs-6 mt-2 text-center">
           Don't have an account?
-          <router-link to="" class="ms-2 text-main">Register</router-link>
+          <router-link to="/register" class="ms-2 text-main">Register</router-link>
         </p>
       </div>
     </div>
@@ -94,8 +94,6 @@ const showPassword = ref(false);
 const togglePassword = () => {
   showPassword.value = !showPassword.value;
 };
-
-// toast.error("Something went wrong!");
 
 const err = reactive({
   email: "",

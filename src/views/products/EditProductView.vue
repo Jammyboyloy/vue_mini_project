@@ -1,0 +1,463 @@
+<template>
+  <template v-if="productStore.loading">
+    <ProductUpdateSkeleton />
+  </template>
+  <template v-else>
+    <div class="container-fluid bg-white rounded-5 p-4">
+      <div class="d-flex align-items-center gap-3">
+        <div class="icon-box-title">
+          <LayersPlus class="text-main" :size="28" />
+        </div>
+        <div>
+          <h3 class="fw-bold mb-1">Product Update</h3>
+          <p class="text-muted mb-0 small">
+            Modify and save changes to your product
+          </p>
+        </div>
+      </div>
+
+      <div class="mt-5 px-2">
+        <form @submit.prevent="submitForm">
+          <div class="row gy-3 gx-5">
+            <div class="col-md-6">
+              <label class="form-label text-secondary fw-bold">Title :</label>
+              <BaseInput
+                v-model="form.title"
+                input-placeholder="Enter Title"
+                input-icon="receipt-text"
+              />
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label text-secondary fw-bold">Price :</label>
+              <BaseInput
+                v-model="form.price"
+                input-placeholder="Enter Price"
+                input-icon="badge-dollar-sign"
+              />
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label text-secondary fw-bold"
+                >Category :</label
+              >
+              <Select
+                v-model="form.category_ids"
+                :options="cate.category || []"
+                optionLabel="name"
+                optionValue="id"
+                filter
+                placeholder="Select Category"
+                class="w-100"
+              >
+                <template #option="slotProps">
+                  <div class="d-flex align-items-center gap-3 py-2">
+                    <LayoutGrid />
+                    <span>{{ slotProps.option.name }}</span>
+                  </div>
+                </template>
+              </Select>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label text-secondary fw-bold"
+                >Condition :</label
+              >
+              <BaseInput
+                v-model="form.condition"
+                input-placeholder="Enter Condition"
+                input-icon="align-center-vertical"
+              />
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label text-secondary fw-bold">Story :</label>
+              <BaseInput
+                v-model="form.story"
+                input-placeholder="Enter Story"
+                input-icon="book-audio"
+              />
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label text-secondary fw-bold">Detail :</label>
+              <BaseInput
+                v-model="form.detail"
+                input-placeholder="Enter Detail"
+                input-icon="list-collapse"
+              />
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label text-secondary fw-bold">Image :</label>
+              <div
+                class="transaction-wrapper p-3 bg-light rounded-4 form-card-height d-flex flex-column"
+              >
+                <div
+                  class="file-status rounded-3 px-3 py-2 mb-3 d-flex align-items-center justify-content-between"
+                  :class="{ 'file-success-bg': previewUrl && !isDefaultImage }"
+                >
+                  <div class="d-flex align-items-center text-truncate">
+                    <FileImage
+                      v-if="previewUrl && !isDefaultImage"
+                      size="20"
+                      color="green"
+                      class="me-2"
+                    />
+                    <FilePlus v-else size="20" color="gray" class="me-2" />
+                    <span class="text-secondary fw-medium text-truncate">
+                      {{
+                        image
+                          ? image.name
+                          : isDefaultImage
+                            ? "Default (No Photo)"
+                            : "Product Image"
+                      }}
+                    </span>
+                  </div>
+                  <i
+                    v-if="!isDefaultImage"
+                    class="bi bi-x-circle fs-5 text-danger pointer"
+                    @click="removeFile"
+                  ></i>
+                </div>
+
+                <div
+                  class="upload-box rounded-3 text-center position-relative overflow-hidden py-2 flex-grow-1"
+                  :class="{ 'has-image': previewUrl, dragover: isDragging }"
+                  @click="isDefaultImage ? openFile() : null"
+                  @dragover.prevent="isDragging = true"
+                  @dragleave.prevent="isDragging = false"
+                  @drop.prevent="handleDrop"
+                >
+                  <input
+                    type="file"
+                    ref="fileInput"
+                    class="d-none"
+                    accept="image/*"
+                    @change="onFileChange"
+                  />
+                  <div v-if="previewUrl" class="preview-container h-100">
+                    <img :src="previewUrl" class="img-preview" />
+                    <div
+                      class="preview-overlay d-flex align-items-center justify-content-center gap-3"
+                    >
+                      <button
+                        v-if="!isDefaultImage"
+                        type="button"
+                        class="action-icon-btn shadow-sm"
+                        data-bs-toggle="modal"
+                        data-bs-target="#previewModal"
+                        @click.stop
+                      >
+                        <Eye :size="20" />
+                      </button>
+                      <button
+                        type="button"
+                        class="action-icon-btn shadow-sm"
+                        @click.stop="openFile"
+                      >
+                        <Upload :size="20" />
+                      </button>
+                      <button
+                        v-if="!isDefaultImage"
+                        type="button"
+                        class="action-icon-btn btn-delete shadow-sm"
+                        @click.stop="removeFile"
+                      >
+                        <Trash2 :size="20" />
+                      </button>
+                    </div>
+                  </div>
+                  <div
+                    v-else
+                    class="h-100 d-flex flex-column align-items-center justify-content-center"
+                  >
+                    <i
+                      class="bi bi-cloud-arrow-up upload-icon mb-2 d-block"
+                    ></i>
+                    <div class="fw-semibold">Attach file</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label text-secondary fw-bold"
+                >Description :</label
+              >
+              <div
+                class="p-3 bg-light rounded-4 form-card-height d-flex flex-column"
+              >
+                <textarea
+                  v-model="form.description"
+                  class="ps-3 pt-3 form-control rounded-3 flex-grow-1"
+                  placeholder="Enter Description"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            :disabled="loading"
+            class="btn bg-btn py-2 px-5 d-block ms-auto mt-5 rounded-5 fw-medium text-white shadow-sm"
+          >
+            <span
+              v-if="loading"
+              class="spinner-border spinner-border-sm me-2"
+            ></span>
+            <LayersPlus size="20" class="me-1" /> Update Product
+          </button>
+        </form>
+      </div>
+
+      <div
+        class="modal shadow-none border-0"
+        id="previewModal"
+        tabindex="-1"
+        aria-hidden="true"
+        style="background: rgba(0, 0, 0, 0.9)"
+      >
+        <div class="modal-dialog modal-fullscreen m-0 border-0">
+          <div class="modal-content bg-transparent border-0">
+            <div
+              class="modal-header border-0 px-4 py-3 d-flex align-items-center"
+            >
+              <div
+                class="d-flex align-items-center text-white me-auto text-truncate"
+                style="max-width: 80%"
+              >
+                <i class="bi bi-file-earmark-image fs-4 me-3"></i>
+                <h6 class="modal-title fw-bold mb-0 text-truncate">
+                  {{ image ? image.name : "Product Image" }}
+                </h6>
+              </div>
+              <button
+                type="button"
+                class="btn-close btn-close-white shadow-none fs-4"
+                data-bs-dismiss="modal"
+              ></button>
+            </div>
+            <div
+              class="modal-body d-flex align-items-center justify-content-center p-0"
+            >
+              <img
+                v-if="previewUrl && !isDefaultImage"
+                :src="previewUrl"
+                class="img-fluid rounded-2 shadow-lg"
+                style="max-height: 80vh; width: auto"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </template>
+</template>
+
+<script setup>
+import { ref, onMounted, computed } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { useCategoryStore } from "@/stores/category";
+import { useProductStore } from "@/stores/product";
+import { notify } from "@/utils/toast";
+import api from "@/api/https";
+import BaseInput from "@/components/BaseInput.vue";
+import Select from "primevue/select";
+import ProductUpdateSkeleton from "@/components/ProductUpdateSkeleton.vue";
+
+const router = useRouter();
+const route = useRoute();
+const toast = notify(router);
+const loading = ref(false);
+
+const DEFAULT_IMAGE =
+  "https://ecommerce201.csm.linkpc.net/storage/products/no_photo.jpg";
+const id = Number(route.params.id);
+const productStore = useProductStore();
+const cate = useCategoryStore();
+
+const fileInput = ref(null);
+const image = ref(null);
+const previewUrl = ref(null);
+const isDragging = ref(false);
+
+const form = ref({
+  title: "",
+  price: "",
+  category_ids: null,
+  condition: "",
+  story: "",
+  detail: "",
+  description: "",
+});
+
+const isDefaultImage = computed(() => previewUrl.value === DEFAULT_IMAGE);
+
+onMounted(async () => {
+  cate.fetchCategory();
+  if (id) {
+    loading.value = true;
+    await productStore.getProductById(id);
+    const data = productStore.productDetail;
+    if (data) {
+      form.value.title = data.title;
+      form.value.price = data.price;
+      form.value.category_ids = data.categories?.[0]?.id || data.category_id;
+      form.value.condition = data.condition;
+      form.value.story = data.story;
+      form.value.detail = data.detail;
+      form.value.description = data.description;
+      previewUrl.value = data.image || DEFAULT_IMAGE;
+    }
+    loading.value = false;
+  }
+});
+
+function openFile() {
+  fileInput.value.click();
+}
+function onFileChange(event) {
+  const file = event.target.files[0];
+  if (file) processFile(file);
+}
+function handleDrop(event) {
+  isDragging.value = false;
+  const file = event.dataTransfer.files[0];
+  if (file && file.type.startsWith("image/")) processFile(file);
+}
+function processFile(file) {
+  image.value = file;
+  previewUrl.value = URL.createObjectURL(file);
+}
+function removeFile() {
+  image.value = null;
+  previewUrl.value = DEFAULT_IMAGE;
+  if (fileInput.value) fileInput.value.value = "";
+}
+
+async function submitForm() {
+  loading.value = true;
+  const formData = new FormData();
+
+  formData.append("title", form.value.title || "");
+  formData.append("price", form.value.price || "");
+  formData.append("condition", form.value.condition || "");
+  formData.append("story", form.value.story || "");
+  formData.append("detail", form.value.detail || "");
+  formData.append("description", form.value.description || "");
+
+  if (form.value.category_ids) {
+    formData.append("category_ids", JSON.stringify([form.value.category_ids]));
+  }
+
+  if (image.value instanceof File) {
+    formData.append("image", image.value);
+  } else if (isDefaultImage.value) {
+    formData.append("image", "");
+  }
+
+  try {
+    await api.post(`/api/products/${id}`, formData);
+    toast.success("Update Product Successfully!", "/dashboard");
+  } catch (err) {
+    console.error("Update error:", err.response?.data);
+    alert(err.response?.data?.message || "Failed to update product");
+  } finally {
+    loading.value = false;
+  }
+}
+</script>
+
+<style scoped>
+.form-card-height {
+  height: 250px;
+}
+.transaction-wrapper {
+  border: 1px solid #edf2f7;
+}
+.file-status {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  font-size: 0.85rem;
+}
+.file-success-bg {
+  border-color: #42b883;
+  background: #f0fff4;
+}
+.upload-box {
+  border: 2px dashed #cbd5e0;
+  background: #ffffff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+.upload-box:hover,
+.upload-box.dragover {
+  border-color: #42b883;
+  background: #f6fffb;
+}
+.upload-box.has-image {
+  border-style: solid;
+  border-color: #42b883;
+  padding: 0 !important;
+}
+.upload-icon {
+  font-size: 32px;
+  color: #42b883;
+}
+.preview-container {
+  width: 100%;
+  position: relative;
+}
+.img-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.preview-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  transition: opacity 0.2s;
+  z-index: 5;
+}
+.upload-box:hover .preview-overlay {
+  opacity: 1;
+}
+.action-icon-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: none;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+}
+.action-icon-btn:hover {
+  background: #f8f9fa;
+}
+.btn-delete:hover {
+  color: #e53e3e !important;
+}
+.pointer {
+  cursor: pointer;
+}
+textarea {
+  resize: none;
+}
+.icon-box-title {
+  background: #f0fff4;
+  padding: 12px;
+  border-radius: 14px;
+}
+</style>

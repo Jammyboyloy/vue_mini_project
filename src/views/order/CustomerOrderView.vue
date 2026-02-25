@@ -22,8 +22,12 @@
 
     <div class="table-responsive">
       <div v-if="order.loading" class="text-center py-5">
-        <div class="spinner-border text-primary" role="status"></div>
-        <p class="mt-2 text-muted small">Fetching pending data...</p>
+        <div class="loader mx-auto">
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </div>
+        <p class="mt-3 text-muted small">Fetching pending data...</p>
       </div>
 
       <table v-else class="table table-hover align-middle">
@@ -31,7 +35,8 @@
           <tr>
             <th class="border-0 ps-4">Product Info</th>
             <th class="border-0">Buyer</th>
-            <th class="border-0 text-center">Amount Info</th> <th class="border-0 text-center">Payment Proof</th>
+            <th class="border-0 text-center">Amount Info</th>
+            <th class="border-0 text-center">Payment Proof</th>
             <th class="border-0 text-center">Status</th>
             <th class="border-0 text-end pe-4">Actions</th>
           </tr>
@@ -71,8 +76,12 @@
             </td>
 
             <td class="text-center">
-              <div class="fw-bold text-main">Total: US ${{ (item.price * item.qty).toLocaleString() }}</div>
-              <div class="text-muted extra-small">US ${{ item.price }} | Qty {{ item.qty }}</div>
+              <div class="fw-bold text-main">
+                Total: US ${{ (item.price * item.qty).toLocaleString() }}
+              </div>
+              <div class="text-muted extra-small">
+                US ${{ item.price }} | Qty {{ item.qty }}
+              </div>
             </td>
 
             <td class="text-center">
@@ -91,20 +100,23 @@
             </td>
 
             <td class="text-center">
-              <span class="badge rounded-pill px-3 py-2 fw-medium bg-cate-warning">Pending</span>
+              <span
+                class="badge rounded-pill px-3 py-2 fw-medium bg-cate-warning"
+                >Pending</span
+              >
             </td>
 
             <td class="pe-4 text-end">
               <div class="d-flex justify-content-end gap-3">
                 <button
-                  @click="updateStatus(item.id, 'approve')"
+                  @click="openModal(item, 'approve')"
                   class="btn btn-sm bg-btn border-0 text-white rounded-pill px-3 fw-medium"
                   :disabled="!item.transaction_file"
                 >
                   Approve
                 </button>
                 <button
-                  @click="updateStatus(item.id, 'reject')"
+                  @click="openModal(item, 'reject')"
                   class="btn btn-sm btn-danger rounded-pill px-3 fw-medium"
                 >
                   Reject
@@ -120,47 +132,120 @@
         </tbody>
       </table>
     </div>
+
+    <BaseModal
+      v-if="showModal"
+      @closeModal="closeModal"
+      position="justify-content-center"
+    >
+      <template #header>
+        <h1 class="modal-title fs-4 mx-auto fw-bold">
+          {{ modalTitle }} #{{ selectedOrder.id }}
+        </h1>
+      </template>
+      <template #body>
+        <img
+          :src="selectedOrder.product.image"
+          alt=""
+          width="150"
+          height="110"
+          class="rounded-4 object-fit-cover mx-auto d-block mb-5"
+        />
+        <p class="text-center m-0" style="font-size: 18px">
+          {{ modalBody }}
+        </p>
+      </template>
+      <template #footer>
+        <button
+          :class="`btn ${color} px-6 rounded-pill py-2 border-0 text-white`"
+          :disabled="loading"
+          @click="handleAction"
+        >
+          <span
+            v-if="loading"
+            class="spinner-border spinner-border-sm me-2 text-white"
+          ></span>
+          {{ modalFooter }}
+        </button>
+      </template>
+    </BaseModal>
   </div>
 </template>
 
 <script setup>
-import { onMounted } from "vue";
+import { onMounted, ref } from "vue";
 import { useOrderStore } from "@/stores/order";
+import BaseModal from "@/components/BaseModal.vue";
+import { useToast } from "vue-toastification";
+let toast = useToast();
 const order = useOrderStore();
-
+const showModal = ref(false);
+const selectedOrder = ref(null);
+let modalTitle = ref("");
+let modalBody = ref("");
+let modalFooter = ref("");
+let color = ref("");
+let loading = ref(false);
+let actionType = ref("");
 onMounted(() => {
   order.fetchOrder();
 });
 
-const updateStatus = async (id, action) => {
-  if (confirm(`Are you sure you want to ${action} this order?`)) {
-    const result = await order.changeStatus(id, action);
-    if (result.success) {
-      alert(`Order ${action}ed successfully!`);
-    }
+const closeModal = () => {
+  if (loading.value) return;
+  showModal.value = false;
+};
+
+const openModal = (item, status) => {
+  showModal.value = true;
+  selectedOrder.value = item;
+  actionType.value = status;
+  if (status == "reject") {
+    modalTitle.value = "Reject Order";
+    modalBody.value = "Are you sure you want to reject this order ?";
+    modalFooter.value = "Reject";
+    color.value = "btn-danger";
+  } else {
+    modalTitle.value = "Approve Order";
+    modalBody.value = "Are you sure you want to approve this order ?";
+    modalFooter.value = "Approve";
+    color.value = "bg-btn";
   }
 };
+
+async function handleAction() {
+  loading.value = true;
+  try {
+    await order.changeStatus(selectedOrder.value.id, actionType.value);
+
+    if (actionType.value === "approve") {
+      toast.success("Approved Successfully!");
+    } else {
+      toast.error("Rejected Successfully!");
+    }
+  } catch (err) {
+    console.log(err);
+  } finally {
+    showModal.value = false;
+    loading.value = false;
+  }
+}
 </script>
 
 <style scoped>
-.bg-cate-warning {
-  background-color: #fff9eb !important;
-  color: #ffcc00 !important;
-}
-.bg-btn {
-  background-color: #42b883 !important;
-}
 .extra-small {
   font-size: 0.75rem;
 }
-.text-main {
-  color: #2c3e50;
-}
+
 .table thead th {
   font-size: 0.8rem;
   letter-spacing: 0.5px;
   color: #6c757d;
   padding: 15px 10px;
   text-transform: uppercase;
+}
+
+.bar {
+  background-color: #6c757d !important;
 }
 </style>

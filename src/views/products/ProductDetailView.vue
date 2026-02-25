@@ -7,7 +7,7 @@
         <span class="bar"></span>
       </div>
     </div>
-    <template v-if="loading">
+    <template v-if="product.loading">
       <DetailSkeleton />
     </template>
     <template v-else>
@@ -16,7 +16,7 @@
           <div class="col-lg-5">
             <div class="card-img px-5" style="height: 500px">
               <img
-                :src="productDetail.image"
+                :src="product.productDetail?.image"
                 alt=""
                 class="w-100 h-100 rounded-4 object-fit-cover"
               />
@@ -25,24 +25,24 @@
           <div class="col-lg-7">
             <div class="d-flex flex-column gap-4 px-5">
               <div class="d-flex flex-column gap-4">
-                <h3 class="m-0 fw-bold mb-2">{{ productDetail.title }}</h3>
+                <h3 class="m-0 fw-bold mb-2">{{ product.productDetail?.title }}</h3>
                 <h4 class="text-main fw-semibold m-0">
-                  US ${{ productDetail.price }}
+                  US ${{ product.productDetail?.price }}
                 </h4>
                 <div class="d-flex gap-3">
                   <h6
-                    class="rounded-4 text-main w-fit bg-cate-primary px-5 align-content-center fs-6 m-0 py-1"
+                    class="rounded-4 text-main w-fit bg-cate-success px-5 align-content-center fs-6 m-0 py-1"
                   >
-                    {{ productDetail?.categories?.[0]?.name }}
+                    {{ product.productDetail?.categories?.[0]?.name }}
                   </h6>
                   <h6
-                    class="rounded-4 text-main w-fit bg-cate-primary px-5 align-content-center fs-6 m-0 py-1"
+                    class="rounded-4 text-main w-fit bg-cate-success px-5 align-content-center fs-6 m-0 py-1"
                   >
-                    {{ productDetail.condition }}
+                    {{ product.productDetail?.condition }}
                   </h6>
                 </div>
 
-                <h4 class="m-0 fw-medium">{{ productDetail.description }}</h4>
+                <h4 class="m-0 fw-medium">{{ product.productDetail?.description }}</h4>
               </div>
 
               <div>
@@ -83,7 +83,7 @@
                 <div class="card-body">
                   <div class="d-flex align-items-center gap-2">
                     <img
-                      :src="productDetail.creator.avatar"
+                      :src="product.productDetail?.creator?.avatar"
                       alt=""
                       class="rounded-circle object-fit-cover"
                       style="width: 40px; height: 40px"
@@ -91,7 +91,7 @@
                     <div class="d-flex gap-1 flex-column">
                       <div class="d-flex gap-2">
                         <p class="m-0 p-0 fs-6">
-                          {{ productDetail.creator.name }}
+                          {{ product.productDetail?.creator?.name }}
                         </p>
                         <h6
                           class="rounded-4 text-main w-fit bg-cate-success py-0 px-3 align-content-center fs-6 m-0"
@@ -100,8 +100,8 @@
                         </h6>
                       </div>
                       <p class="m-0 p-0 fs-6">
-                        {{ productDetail.creator.email }} | Member Since
-                        {{ formatDate(productDetail.created_at) }}
+                        {{ product.productDetail?.creator?.email }} | Member Since
+                        {{ formatDate(product.productDetail?.created_at) }}
                       </p>
                     </div>
                   </div>
@@ -116,39 +116,22 @@
 </template>
 
 <script setup>
-import api from "@/api/https";
 import DetailSkeleton from "@/components/DetailSkeleton.vue";
 import { useCartStore } from "@/stores/cart";
+import { useProductStore } from "@/stores/product";
 import { onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 const route = useRoute();
 const router = useRouter();
 const id = Number(route.params.id);
-let loading = ref(false);
-const productDetail = ref({
-  categories: [],
-  creator: {},
-});
+let product = useProductStore();
 
 const cart = useCartStore();
 let qty = ref(1);
 
-const fetchProductById = async () => {
-  loading.value = true;
-  try {
-    const res = await api.get(`/api/products/${id}`);
-    productDetail.value = res.data.data;
-    console.log(res);
-  } catch (err) {
-    console.log(err);
-  } finally {
-    loading.value = false;
-  }
-};
-
 onMounted(() => {
-  fetchProductById();
+  product.getProductById(id);
 });
 
 const handleCart = () => {

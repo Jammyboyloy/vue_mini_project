@@ -64,9 +64,21 @@ const router = createRouter({
           meta: { require: true },
         },
         {
+          path: "myProfile",
+          name: "myProfile",
+          component: () => import("../views/profile/ProfileView.vue"),
+          meta: { require: true },
+        },
+        {
           path: "createProduct",
           name: "createProduct",
           component: () => import("../views/products/CreateProductView.vue"),
+          meta: { require: true },
+        },
+        {
+          path: "editProduct/:id",
+          name: "editProduct",
+          component: () => import("../views/products/EditProductView.vue"),
           meta: { require: true },
         },
         {
@@ -81,7 +93,18 @@ const router = createRouter({
           component: () => import("../views/order/previewOrderView.vue"),
           meta: { require: true },
         },
+        {
+          path: "MyOrder",
+          name: "MyOrder",
+          component: () => import("../views/order/MyOrderView.vue"),
+          meta: { require: true },
+        },
       ],
+    },
+    {
+      path: "/register",
+      name: "register",
+      component: () => import("../views/auth/RegisterView.vue"),
     },
   ],
 });
