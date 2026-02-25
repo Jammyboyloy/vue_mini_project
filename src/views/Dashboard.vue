@@ -93,8 +93,12 @@
 
     <div class="table-responsive mt-5">
       <div v-if="own.loading" class="text-center py-5">
-        <div class="spinner-border text-primary" role="status"></div>
-        <p class="mt-2 text-muted small">Fetching pending data...</p>
+        <div class="loader">
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </div>
+        <p class="mt-3 text-muted small">Loading your products...</p>
       </div>
 
       <BaseTable
@@ -234,6 +238,9 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.bar {
+  background-color: #6c757d;
+}
 .icon-box-title {
   background: #f0fff4;
   padding: 12px;
