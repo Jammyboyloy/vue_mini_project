@@ -127,15 +127,12 @@
         </template>
       </BaseTable>
 
-      <!-- <BasePagination
-        :totalPages="cate.pagination.totalPages"
-        :currentPage="cate.pagination.currentPage"
-        :hasNextPage="cate.pagination.hasNextPage"
-        :hasPreviousPage="cate.pagination.hasPreviousPage"
-        :totalItems="cate.pagination.totalItems"
-        :itemPerPage="per_page"
-        @changePage="changePage"
-      /> -->
+      <BasePagination
+        v-if="own.pagination.last_page && own.pagination.last_page > 1"
+        v-bind="own.pagination"
+        :class="{ 'd-none': own.loading }"
+        @changePage="handleChangePage"
+      />
 
       <!-- Create Modal / Edit Modal -->
       <BaseModal
@@ -162,6 +159,13 @@
         </template>
         <template #footer>
           <button
+            type="button"
+            class="btn btn-secondary rounded-pill px-6 py-2"
+            @click="closeModal"
+          >
+            Cancel
+          </button>
+          <button
             class="btn btn-danger px-6 rounded-pill py-2"
             @click="handleAction"
             :disabled="loading"
@@ -182,6 +186,7 @@
 import BaseModal from "@/components/BaseModal.vue";
 import { useOwnProductStore } from "@/stores/OwnProduct";
 import BaseTable from "@/components/BaseTable.vue";
+import BasePagination from "@/components/BasePagination.vue";
 import { onMounted, ref } from "vue";
 import api from "@/api/https";
 import { useRouter } from "vue-router";
@@ -199,6 +204,7 @@ let showModal = ref(false);
 let loading = ref(false);
 let items = ref([]);
 const router = useRouter();
+let per_page = ref(2);
 
 async function handleAction() {
   loading.value = true;
@@ -219,6 +225,10 @@ const closeModal = () => {
   showModal.value = false;
 };
 
+const handleChangePage = (page) => {
+  own.fetchMyOwnProduct(page, per_page.value);
+};
+
 const handleDelete = (row) => {
   showModal.value = true;
   items.value = row;
@@ -233,7 +243,7 @@ const goCreateProduct = () => {
 };
 
 onMounted(() => {
-  own.fetchMyOwnProduct();
+  own.fetchMyOwnProduct(1, per_page.value);
 });
 </script>
 

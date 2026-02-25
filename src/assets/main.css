@@ -64,8 +64,12 @@ body {
 }
 
 .bg-cate-success {
-  background-color: #f0fff4 !important;
+  background-color: #d1fae5 !important;
   color: #42b883 !important;
+}
+
+.bg-icon {
+  background-color: #f0fff4;
 }
 
 .bg-cate-danger {

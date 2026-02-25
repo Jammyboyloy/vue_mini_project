@@ -2,7 +2,7 @@
   <div class="container-fluid py-4 bg-white rounded-5 px-4 shadow-sm">
     <div class="d-flex align-items-center justify-content-between mb-5">
       <div class="d-flex align-items-center gap-3">
-        <div class="p-3 bg-cate-success rounded-4">
+        <div class="p-3 bg-icon rounded-4">
           <LayoutGrid class="text-main" :size="28" />
         </div>
         <div>
@@ -14,7 +14,7 @@
         @click="handleCreate"
         class="btn bg-btn px-4 rounded-pill fw-medium d-flex align-items-center gap-2"
       >
-        Create Category
+        <Plus /> Create Category
       </button>
     </div>
 
@@ -36,16 +36,6 @@
         @delete="handleDelete"
       ></BaseTable>
 
-      <!-- <BasePagination
-        :totalPages="cate.pagination.totalPages"
-        :currentPage="cate.pagination.currentPage"
-        :hasNextPage="cate.pagination.hasNextPage"
-        :hasPreviousPage="cate.pagination.hasPreviousPage"
-        :totalItems="cate.pagination.totalItems"
-        :itemPerPage="per_page"
-        @changePage="changePage"
-      /> -->
-
       <!-- Create Modal / Edit Modal -->
       <BaseModal v-if="showModal" @close-modal="closeModal">
         <template #header>
@@ -61,7 +51,14 @@
         </template>
         <template #footer>
           <button
-            :class="`btn ${color}`"
+            type="button"
+            class="btn btn-secondary rounded-pill px-6 py-2"
+            @click="closeModal"
+          >
+            Cancel
+          </button>
+          <button
+            :class="`btn ${color} px-6 py-2 rounded-pill`"
             @click="handleAction"
             :disabled="loading"
           >
@@ -79,7 +76,6 @@
 
 <script setup>
 import BaseModal from "@/components/BaseModal.vue";
-import BasePagination from "@/components/BasePagination.vue";
 import BaseTable from "@/components/BaseTable.vue";
 import { useCategoryStore } from "@/stores/category";
 import { onMounted, ref } from "vue";
@@ -134,10 +130,6 @@ async function handleAction() {
     cate.fetchCategory(1, per_page.value);
   }
 }
-
-const changePage = (page) => {
-  cate.fetchCategory(page, per_page.value);
-};
 
 const closeModal = () => {
   showModal.value = false;

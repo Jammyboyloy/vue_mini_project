@@ -2,7 +2,7 @@
   <div class="container-fluid py-4 bg-white rounded-5 px-4 shadow-sm">
     <div class="d-flex align-items-center justify-content-between mb-5">
       <div class="d-flex align-items-center gap-3">
-        <div class="p-3 bg-cate-success rounded-4">
+        <div class="p-3 bg-icon rounded-4">
           <ListTodo class="text-main" :size="28" />
         </div>
         <div>
@@ -12,12 +12,6 @@
           </p>
         </div>
       </div>
-      <router-link
-        to="/r"
-        class="btn btn-primary px-4 rounded-pill fw-bold d-flex align-items-center gap-2"
-      >
-        View Processed Orders
-      </router-link>
     </div>
 
     <div class="table-responsive">
@@ -156,6 +150,14 @@
         </p>
       </template>
       <template #footer>
+        <button
+          type="button"
+          class="btn btn-secondary rounded-pill px-6 py-2"
+          @click="closeModal"
+        >
+          Cancel
+        </button>
+
         <button
           :class="`btn ${color} px-6 rounded-pill py-2 border-0 text-white`"
           :disabled="loading"
