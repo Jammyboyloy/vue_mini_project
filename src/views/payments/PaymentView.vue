@@ -367,107 +367,15 @@
             </div>
         </div>
     </form>
-    <BaseModal v-if="showModal" @closeModal="showModal = false" closeText="Close" position="justify-content-end">
-        <template #header>
-            <h5 class="fw-bold mb-0">Order Detail #{{ selectedOrder.id }}</h5>
-        </template>
-
-        <template #body>
-            <div class="row g-3">
-                <div class="col-12 border-bottom pb-3">
-                    <div class="d-flex gap-3 align-items-start">
-                        <img :src="selectedOrder.product?.image" class="rounded-3" width="80" height="80"
-                            style="object-fit: cover" />
-                        <div>
-                            <h6 class="fw-bold mb-1">{{ selectedOrder.product?.title }}</h6>
-                            <p class="text-muted small mb-0 mt-2">
-                                {{ formatDate(selectedOrder?.created_at) }}
-                            </p>
-                            <p class="badge bg-light text-dark border small mt-2">
-                                Condition : {{ selectedOrder.product?.condition }}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-6">
-                    <label class="text-muted small d-block">Price x Qty</label>
-                    <span class="fw-semibold">US ${{ selectedOrder.price }} x {{ selectedOrder.qty }}</span>
-                </div>
-                <div class="col-6 text-end">
-                    <label class="text-muted small d-block">Total Amount</label>
-                    <span class="fw-bold text-main fs-5">US ${{ selectedOrder.price * selectedOrder.qty }}</span>
-                </div>
-
-                <div class="col-12 bg-light p-3 rounded-4">
-                    <div class="row">
-                        <div class="col-6">
-                            <label class="text-muted extra-small d-block">Delivery Status</label>
-                            <span class="small fw-bold">
-                                {{
-                                    selectedOrder.is_delivery === 2
-                                        ? "🚚 Delivery Required"
-                                        : "🏠 Self Pickup"
-                                }}
-                            </span>
-                        </div>
-                        <div class="col-6 text-end" v-if="selectedOrder.google_map_url">
-                            <a :href="selectedOrder.google_map_url" target="_blank"
-                                class="btn btn-sm bg-btn text-white rounded-pill px-3">
-                                View Map
-                            </a>
-                        </div>
-                        <div class="col-12 mt-2" v-if="selectedOrder.address">
-                            <label class="text-muted extra-small d-block">Address</label>
-                            <p class="small mb-0">{{ selectedOrder.address }}</p>
-                        </div>
-                        <div class="col-12 mt-2" v-if="selectedOrder.address">
-                            <label class="text-muted extra-small d-block">Phone</label>
-                            <p class="small mb-0">{{ selectedOrder?.phone ?? "N/A" }}</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-6">
-                    <label class="text-muted small d-block">Buyer Email</label>
-                    <span class="small">{{ selectedOrder.buyer?.email }}</span>
-                </div>
-                <div class="col-6">
-                    <label class="text-muted small d-block">Buyer Name</label>
-                    <span class="small">{{ selectedOrder.buyer?.name }}</span>
-                </div>
-
-                <div class="col-12 mt-3">
-                    <label class="text-muted small d-block mb-2 fw-bold text-uppercase"
-                        style="font-size: 0.65rem; letter-spacing: 0.5px">
-                        Payment Receipt
-                    </label>
-
-
-                    <div v-if="selectedOrder.transaction_file">
-                        <div
-                            class="d-flex flex-column align-items-center gap-1 py-2 border shadow-sm rounded-4 bg-light">
-                            <div class="extra-small fw-bold text-dark">Receipt Image</div>
-                            <a :href="selectedOrder.transaction_file" target="_blank">
-                                <img :src="selectedOrder.transaction_file" class="rounded-3 border shadow-sm" style="width: 60px;height: 60px;object-fit: cover;transition: transform 0.2s;" />
-                            </a>
-                        </div>
-                    </div>
-
-                    <div v-else class="p-3 border border-dashed rounded-4 text-center bg-light">
-                        <span class="text-muted extra-small italic">No receipt provided for this order</span>
-                    </div>
-                </div>
-            </div>
-        </template>
-    </BaseModal>
 
 </template>
 <script setup>
 import api from "@/api/https";
 import { useCartStore } from "@/stores/cart";
+import { notify } from "@/utils/toast";
 import { checkContent, checkFileSize, validates, require } from "@/utils/validate";
 import { ref, computed, onUnmounted, watch, onMounted, reactive } from "vue";
+import { useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
 
 const cartStore = useCartStore();
@@ -689,7 +597,8 @@ function validate() {
     return !err.transaction_file && !err.address && !err.google_map_url && !err.is_delivery
 }
 
-const toast = useToast();
+let router = useRouter();
+let toast = notify(router);
 
 const saveCheckout = async () => {
     if (!validate()) return;
@@ -710,7 +619,7 @@ const saveCheckout = async () => {
         const res = await api.post("/api/carts/checkout", form);
         console.log("Success:", res.data);
         // toast.succes(res.data)
-        toast.success("Checkout Successfully!");
+        toast.success("Checkout Successfully!", "/receipt");
     } catch (err) {
         console.error(err);
         toast.error(err.message);

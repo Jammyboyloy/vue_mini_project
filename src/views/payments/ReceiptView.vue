@@ -1,6 +1,35 @@
-<script setup lang="ts">
+<script setup>
+import { useCartStore } from '@/stores/cart';
+import { useOrderStore } from '@/stores/order';
+import { useProfileStore } from '@/stores/profile';
 import { ShoppingBag } from 'lucide-vue-next';
+import { onMounted } from 'vue';
+const profile = useProfileStore();
+const cart = useCartStore();
+const order = useOrderStore();
 
+onMounted(async () => {
+    await profile.fetchMyProfile();
+    await cart.fetchMyCart();
+    await order.fetchOrder();
+});
+
+function formatDate(dateString) {
+    if (!dateString) return "N/A";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+        month: "short",
+        day: "2-digit",
+        year: "numeric",
+    });
+}
+
+function formatCurrency(value) {
+    return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+    }).format(value ?? 0);
+}
 
 </script>
 
@@ -10,17 +39,17 @@ import { ShoppingBag } from 'lucide-vue-next';
             <div class="bg-white rounded-4 overflow-hidden shadow">
 
                 <!-- Header -->
-                <div class="bg-btn d-flex justify-content-between align-items-center px-4 py-4">
+                <div class="receipt-header d-flex justify-content-between align-items-center px-4 py-4">
                     <div>
                         <div class="fs-4 fw-bold text-white">
-                            <img src="../../assets/img/logo vue.png" width="180px" class="mt-n8 ms-n5" alt="">
+                            <img src="../../assets/img/logo vue2.png" width="180px" class="ms-n5" alt="">
                         </div>
                         <!-- <div class="text-white opacity-75 mt-n3">Thank you for your purchase!</div> -->
                     </div>
                     <div class="text-end">
                         <div class="text-white fw-bold text-uppercase ls-wide">Receipt</div>
-                        <div class="text-white opacity-75 small mt-1">Order ID: #12345</div>
-                        <div class="text-white opacity-75 small">Nov 23, 2023 · 10:00</div>
+                        <!-- <div class="text-white opacity-75 small mt-1">Order ID: #{{}}</div> -->
+                        <div class="text-white opacity-75 small">{{ formatDate() }}</div>
                         <div class="mt-2">
                             <span class="badge rounded-pill d-inline-flex align-items-center gap-1 px-3 py-2"
                                 style="background: rgba(255,255,255,0.2); color: white; font-size: 0.75rem;">
@@ -42,10 +71,9 @@ import { ShoppingBag } from 'lucide-vue-next';
                                 style="font-size: 0.65rem; letter-spacing: 0.1em;">
                                 Billed To
                             </div>
-                            <div class="fw-bold text-dark">John Doe</div>
+                            <div class="fw-bold text-dark">{{ profile.myProfile?.name ?? "N/A" }}</div>
                             <div class="text-muted small lh-lg">
-                                john@example.com<br>
-                                +123 456 789
+                                {{ profile.myProfile?.email ?? "N/A" }}<br>{{ profile.myProfile?.phone ?? "N/A" }}
                             </div>
                         </div>
                         <div class="col-6 text-end">
@@ -53,12 +81,10 @@ import { ShoppingBag } from 'lucide-vue-next';
                                 style=" font-size: 0.65rem; letter-spacing: 0.1em;">
                                 Shipped To
                             </div>
-                            <div class="fw-bold text-dark">123 Street Name</div>
+                            <div class="fw-bold text-dark">{{ "N/A" }}</div>
                             <div class="text-muted small lh-lg">
-                                City, 12345<br>
-                                Country<br>
-                                <em><i class="fa-solid fa-note-sticky me-1"></i>Leave at
-                                    door</em>
+
+                                <em>{{ "N/A" }}</em>
                             </div>
                         </div>
                     </div>
@@ -76,16 +102,33 @@ import { ShoppingBag } from 'lucide-vue-next';
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
+                            <tr v-if="order.loading">
+                                <td colspan="4" class="text-center text-muted py-4">
+                                    <div class="spinner-border spinner-border-sm text-success me-2"></div>
+                                    Loading items...
+                                </td>
+                            </tr>
+                            <tr v-else-if="order.orderProduct.length === 0">
+                                <td colspan="4" class="text-center text-muted py-4">No orders found.</td>
+                            </tr>
+                            <tr v-else v-for="item in order.orderProduct" :key="item.id">
                                 <td class="ps-3">
-                                    <div class="fw-semibold">Classic White Tee</div>
-                                    <div class="text-muted" style="font-size: 0.75rem;">
-                                        
+                                    <div class="d-flex align-items-center gap-2">
+                                        <img :src="item.product.image" width="40" height="40"
+                                            class="rounded-2 object-fit-cover" alt="">
+                                        <div>
+                                            <div class="fw-semibold">{{ item.product.title }}</div>
+                                            <div class="text-muted" style="font-size: 0.75rem;">
+                                                {{ item.product.categories?.[0]?.name ?? "—" }}
+                                            </div>
+                                        </div>
                                     </div>
                                 </td>
-                                <td class="text-center align-middle">2</td>
-                                <td class="text-end align-middle">$10.00</td>
-                                <td class="text-end align-middle fw-semibold pe-3">$20.00</td>
+                                <td class="text-center align-middle">{{ item.qty }}</td>
+                                <td class="text-end align-middle">{{ formatCurrency(item.price) }}</td>
+                                <td class="text-end align-middle fw-semibold pe-3">
+                                    {{ formatCurrency(item.qty * item.price) }}
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -119,10 +162,10 @@ import { ShoppingBag } from 'lucide-vue-next';
                     <!-- Actions -->
                     <div class="d-flex justify-content-center gap-3 mt-4 no-print">
                         <button onclick="window.print()" class="btn bg-btn rounded-pill px-4 py-2 fw-semibold">
-                            <download class="fa-solid fa-print me-2"/>Download Receipt
+                            <download class="fa-solid fa-print me-2" />Download Receipt
                         </button>
                         <router-link to="/shopping" class="btn btn-outline-success rounded-pill px-4 py-2 fw-semibold">
-                            <ShoppingBag class="fa-solid fa-arrow-left me-2"/>Continue Shopping
+                            <ShoppingBag class="fa-solid fa-arrow-left me-2" />Continue Shopping
                         </router-link>
                     </div>
 
@@ -140,6 +183,34 @@ import { ShoppingBag } from 'lucide-vue-next';
 </template>
 
 <style scoped>
+.receipt-header {
+    background-color: #42b883;
+    position: relative;
+    overflow: hidden;
+}
+
+.receipt-header::before {
+    content: '';
+    position: absolute;
+    top: -40px;
+    right: -40px;
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.receipt-header::after {
+    content: '';
+    position: absolute;
+    bottom: -60px;
+    left: 30%;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+}
+
 .dashed-hr {
     border-top: 2px dashed #39de4c;
 }
@@ -154,8 +225,8 @@ import { ShoppingBag } from 'lucide-vue-next';
 }
 
 .btn-outline-success:hover {
-  background-color: #42b883 !important;
-  border: none;
+    background-color: #42b883 !important;
+    border: none;
 }
 
 .table tbody tr td {
@@ -168,9 +239,24 @@ import { ShoppingBag } from 'lucide-vue-next';
 }
 
 @media print {
-    body * { visibility: hidden; }
-    .receipt-print, .receipt-print * { visibility: visible; }
-    .receipt-print { position: absolute; top: 0; left: 0; width: 100%; }
-    .no-print { display: none !important; }
+    body * {
+        visibility: hidden;
+    }
+
+    .receipt-print,
+    .receipt-print * {
+        visibility: visible;
+    }
+
+    .receipt-print {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+    }
+
+    .no-print {
+        display: none !important;
+    }
 }
 </style>
