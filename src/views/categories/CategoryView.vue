@@ -132,6 +132,7 @@ async function handleAction() {
 }
 
 const closeModal = () => {
+  if (loading.value) return;
   showModal.value = false;
 };
 

@@ -150,3 +150,9 @@ body {
     transform: scaleY(1);
   }
 }
+
+.form-control:focus {
+  border-color: #42b883 !important;
+  box-shadow: 0 0 0 0.15rem rgba(66, 184, 131, 0.346) !important;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}

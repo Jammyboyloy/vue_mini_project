@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard-container">
-    <nav :class="['sidebar', collapsed ? 'collapsed' : '']">
+    <nav :class="['sidebar', collapsed ? 'collapsed' : '']" style="z-index: 1000;">
       <div class="sidebar-header">
         <div class="brand" :class="{ 'brand-visible': !collapsed }">
           <router-link to="/">
@@ -27,6 +27,10 @@
             <component :is="item.icon" size="24" />
           </div>
           <span class="nav-text" :class="{ 'text-visible': !collapsed }">
+            {{ item.text }}
+          </span>
+
+          <span class="sidebar-hover-box" v-if="collapsed">
             {{ item.text }}
           </span>
         </router-link>
@@ -63,31 +67,11 @@ const toggleSidebar = () => {
 const menuItems = [
   { text: "My Product", path: "/dashboard", icon: Store },
   { text: "My Profile", path: "/dashboard/myProfile", icon: User },
-  {
-    text: "Create Product",
-    path: "/dashboard/createProduct",
-    icon: LayersPlus,
-  },
-  {
-    text: "Category",
-    path: "/dashboard/category",
-    icon: LayoutGrid,
-  },
-  {
-    text: "Customer Order",
-    path: "/dashboard/customerOrder",
-    icon: ListTodo,
-  },
-  {
-    text: "Preview Order",
-    path: "/dashboard/previewOrder",
-    icon: ListChecks,
-  },
-  {
-    text: "My Order",
-    path: "/dashboard/MyOrder",
-    icon: ShoppingBag,
-  },
+  { text: "Create Product", path: "/dashboard/createProduct", icon: LayersPlus },
+  { text: "Category", path: "/dashboard/category", icon: LayoutGrid },
+  { text: "Customer Order", path: "/dashboard/customerOrder", icon: ListTodo },
+  { text: "Preview Order", path: "/dashboard/previewOrder", icon: ListChecks },
+  { text: "My Order", path: "/dashboard/MyOrder", icon: ShoppingBag },
 ];
 </script>
 
@@ -109,7 +93,7 @@ const menuItems = [
   transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   height: 100vh;
   flex-shrink: 0;
-  overflow: hidden;
+  overflow: visible !important; 
 }
 
 .sidebar.collapsed {
@@ -126,9 +110,7 @@ const menuItems = [
 
 .brand {
   white-space: nowrap;
-  transition:
-    opacity 0.2s ease,
-    transform 0.3s ease;
+  transition: opacity 0.2s ease, transform 0.3s ease;
   opacity: 0;
 }
 
@@ -155,8 +137,8 @@ const menuItems = [
 .nav-links {
   padding: 15px 0;
   flex-grow: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow-y: visible !important; 
+  overflow-x: visible !important;
 }
 
 .nav-item {
@@ -181,13 +163,10 @@ const menuItems = [
   z-index: 2;
 }
 
-/* FIXED: Smooth Nav Text */
 .nav-text {
   font-weight: 500;
   white-space: nowrap;
-  transition:
-    opacity 0.2s ease,
-    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity 0.2s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   opacity: 0;
   transform: translateX(-15px);
 }
@@ -202,26 +181,45 @@ const menuItems = [
   color: #fff;
 }
 
+/* Tooltip Hover State */
+.nav-item:hover .sidebar-hover-box {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateX(10px);
+}
+
 .nav-item.active {
   background: #42b883 !important;
   color: #ffffff !important;
 }
 
-/* Layout parts */
+/* --- THE CLEAN TEXT BOX (NO ARROW) --- */
+.sidebar-hover-box {
+  position: absolute;
+  left: 65px;
+  background-color: #35495e; 
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  z-index: 9999; 
+  box-shadow: 10px 10px 20px rgba(0,0,0,0.2);
+  pointer-events: none;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
 .main-content {
   flex: 1;
   display: flex;
   flex-direction: column;
   height: 100vh;
   min-width: 0;
-}
-
-.top-bar {
-  height: 70px;
-  background: #ffffff;
-  display: flex;
-  align-items: center;
-  padding: 0 30px;
+  z-index: 1; 
 }
 
 .content-body {

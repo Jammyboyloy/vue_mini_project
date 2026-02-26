@@ -7,22 +7,23 @@
         class="container bg-white shadow-sm py-4 px-6 rounded-4 shadow-sm"
         style="width: 500px"
       >
-        <h3 class="text-center text-main fw-medium mb-3">Create Account</h3>
-        <form @submit.prevent="handleLogin">
+        <h3 class="text-center text-main fw-medium mb-3">Sign Up</h3>
+        <form @submit.prevent="handleRegister">
           <label class="form-label">Name : </label>
           <BaseInput
             input-placeholder="Enter your name"
             input-icon="User"
             v-model="name"
-            class="mb-3"
+            autocomplete="username"
           />
-          <p v-if="err.email" class="text-danger m-0">{{ err.email }}</p>
+          <p v-if="err.name" class="text-danger m-0">{{ err.name }}</p>
 
-          <label class="form-label">Email : </label>
+          <label class="form-label my-2">Email : </label>
           <BaseInput
             input-placeholder="Enter your email"
             input-icon="Mail"
             v-model="email"
+            autocomplete="username"
           />
           <p v-if="err.email" class="text-danger m-0">{{ err.email }}</p>
 
@@ -31,8 +32,9 @@
             <input
               :type="showPassword ? 'text' : 'password'"
               v-model="password"
-              class="form-control bg-prime fs-text ps-7"
+              class="form-control bg-white ps-7"
               placeholder="Enter your password"
+              autocomplete="new-password"
             />
 
             <LockKeyhole
@@ -63,8 +65,9 @@
             <input
               :type="showConfirmPassword ? 'text' : 'password'"
               v-model="password_confirmation"
-              class="form-control bg-prime fs-text ps-7"
+              class="form-control bg-white ps-7"
               placeholder="Enter your confirm password"
+              autocomplete="new-password"
             />
 
             <LockKeyhole
@@ -86,8 +89,8 @@
               @click="toggleConfirmPassword"
             />
           </div>
-          <p v-if="err.password" class="text-danger m-0">
-            {{ err.password }}
+          <p v-if="err.password_confirmation" class="text-danger m-0">
+            {{ err.password_confirmation }}
           </p>
 
           <button
@@ -100,7 +103,7 @@
               class="spinner-border spinner-border-sm me-2 text-white"
             ></span>
             <span class="text-white">{{
-              isLoading ? "Signing In..." : "Sign In"
+              isLoading ? "Signing Up..." : "Sign Up"
             }}</span>
           </button>
         </form>
@@ -127,16 +130,18 @@ import { ref, reactive } from "vue";
 import { useRouter } from "vue-router";
 import { isEmail, require, validates } from "@/utils/validate";
 import BaseInput from "@/components/BaseInput.vue";
-import { useToast } from "vue-toastification";
-let toast = useToast();
+import { notify } from "@/utils/toast";
+const auth = useAuthStore();
 
 const email = ref("");
 const name = ref("");
 const password = ref("");
 const password_confirmation = ref("");
+const isLoading = ref(false);
 const router = useRouter();
 const showPassword = ref(false);
 const showConfirmPassword = ref(false);
+let toast = notify(router);
 
 const togglePassword = () => {
   showPassword.value = !showPassword.value;
@@ -147,8 +152,10 @@ const toggleConfirmPassword = () => {
 };
 
 const err = reactive({
+  name: "",
   email: "",
   password: "",
+  password_confirmation: "",
 });
 
 function validate() {
@@ -158,21 +165,28 @@ function validate() {
   ]);
 
   err.password = require(password.value, "Password is require");
+  err.name = require(name.value, "Name is require");
+  err.password_confirmation = require(password_confirmation.value, "Confirm password is require");
 
-  return !err.email && !err.password;
+  return !err.email && !err.password && !err.name && !err.password_confirmation;
 }
 
-let auth = useAuthStore();
-
 async function handleRegister() {
-  await auth.register(
-    firstName.value,
-    lastName.value,
-    email.value,
-    password.value,
-    confirmPassword.value,
-  );
-  router.push("/login");
+  if (!validate()) return;
+  isLoading.value = true;
+  try {
+    await auth.register(
+      name.value,
+      email.value,
+      password.value,
+      password_confirmation.value,
+    );
+    toast.success("Sign Up Successfully!", "/login");
+  } catch (err) {
+    console.log(err);
+  } finally {
+    isLoading.value = false;
+  }
 }
 </script>
 

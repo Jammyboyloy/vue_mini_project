@@ -31,7 +31,7 @@
             <th class="border-0">Buyer</th>
             <th class="border-0">Amount</th>
             <th class="border-0 text-center">Status</th>
-            <th class="border-0 text-end pe-4">Actions</th>
+            <th class="border-0 text-end">View Detail</th>
           </tr>
         </thead>
         <tbody>
@@ -70,9 +70,9 @@
             <td class="pe-4 text-end">
               <button
                 @click="openDetail(item)"
-                class="btn btn-sm btn-light border rounded-pill px-3"
+                class="btn border-0"
               >
-                Detail
+                <ClipboardList size="30" />
               </button>
             </td>
           </tr>
@@ -99,7 +99,12 @@
       position="justify-content-end"
     >
       <template #header>
-        <h5 class="fw-bold mb-0">Order Detail #{{ selectedOrder.id }}</h5>
+        <div class="d-flex mt-3 justify-content-between align-items-center w-100">
+          <h5 class="fw-bold mb-0">
+            Order Detail #{{ selectedOrder.id }}
+          </h5>
+          <X @click="showModal = false" size="35" class="cursor-pointer" />
+        </div>
       </template>
 
       <template #body>

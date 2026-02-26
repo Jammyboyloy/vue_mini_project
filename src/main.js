@@ -1,6 +1,8 @@
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap/dist/js/bootstrap.bundle.min.js'
 import 'bootstrap-icons/font/bootstrap-icons.css'
+// npm i bootstrap@5.3.8
+// npm i axios
 
 // npm install vue-toastification@next
 import Toast from "vue-toastification";
