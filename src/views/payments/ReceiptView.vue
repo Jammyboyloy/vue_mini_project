@@ -3,16 +3,32 @@ import { useCartStore } from '@/stores/cart';
 import { useOrderStore } from '@/stores/order';
 import { useProfileStore } from '@/stores/profile';
 import { ShoppingBag } from 'lucide-vue-next';
-import { onMounted } from 'vue';
+import { computed, onMounted } from 'vue';
 const profile = useProfileStore();
 const cart = useCartStore();
 const order = useOrderStore();
 
 onMounted(async () => {
     await profile.fetchMyProfile();
-    await cart.fetchMyCart();
-    await order.fetchOrder();
+    // await cart.fetchMyCart();
+    await order.fetchMyOrder(1,100);
 });
+
+const latestTimestamp = computed(() => {
+    if (!order.myOrder.length) return null;
+    return order.myOrder.reduce((latest, item) =>
+        item.created_at > latest ? item.created_at : latest,
+        order.myOrder[0].created_at
+    );
+});
+
+const latestOrderItems = computed(() =>
+    order.myOrder.filter(item => item.created_at === latestTimestamp.value)
+);
+
+const grandTotal = computed(() =>
+    latestOrderItems.value.reduce((sum, item) => sum + item.price * item.qty, 0)
+);
 
 function formatDate(dateString) {
     if (!dateString) return "N/A";
@@ -49,7 +65,7 @@ function formatCurrency(value) {
                     <div class="text-end">
                         <div class="text-white fw-bold text-uppercase ls-wide">Receipt</div>
                         <!-- <div class="text-white opacity-75 small mt-1">Order ID: #{{}}</div> -->
-                        <div class="text-white opacity-75 small">{{ formatDate() }}</div>
+                        <div class="text-white opacity-75 small"> {{ formatDate(latestTimestamp) }}</div>
                         <div class="mt-2">
                             <span class="badge rounded-pill d-inline-flex align-items-center gap-1 px-3 py-2"
                                 style="background: rgba(255,255,255,0.2); color: white; font-size: 0.75rem;">
@@ -73,7 +89,7 @@ function formatCurrency(value) {
                             </div>
                             <div class="fw-bold text-dark">{{ profile.myProfile?.name ?? "N/A" }}</div>
                             <div class="text-muted small lh-lg">
-                                {{ profile.myProfile?.email ?? "N/A" }}<br>{{ profile.myProfile?.phone ?? "N/A" }}
+                                {{ profile.myProfile?.email ?? "N/A" }}
                             </div>
                         </div>
                         <div class="col-6 text-end">
@@ -81,10 +97,9 @@ function formatCurrency(value) {
                                 style=" font-size: 0.65rem; letter-spacing: 0.1em;">
                                 Shipped To
                             </div>
-                            <div class="fw-bold text-dark">{{ "N/A" }}</div>
+                            <!-- <div class="fw-bold text-dark">{{ latestOrderItems[0]?.buyer?.name ?? "N/A" }}</div> -->
                             <div class="text-muted small lh-lg">
-
-                                <em>{{ "N/A" }}</em>
+                                {{ latestOrderItems[0]?.address ?? "N/A" }}<br>{{ profile.myProfile?.phone ?? "N/A" }}
                             </div>
                         </div>
                     </div>
@@ -108,10 +123,10 @@ function formatCurrency(value) {
                                     Loading items...
                                 </td>
                             </tr>
-                            <tr v-else-if="order.orderProduct.length === 0">
+                            <tr v-else-if="latestOrderItems.length === 0">
                                 <td colspan="4" class="text-center text-muted py-4">No orders found.</td>
                             </tr>
-                            <tr v-else v-for="item in order.orderProduct" :key="item.id">
+                            <tr v-else v-for="item in latestOrderItems" :key="item.id">
                                 <td class="ps-3">
                                     <div class="d-flex align-items-center gap-2">
                                         <img :src="item.product.image" width="40" height="40"
@@ -140,20 +155,18 @@ function formatCurrency(value) {
                                 style="background:  #f6fffb;; border: 1.5px solid rgba(66,184,131,0.2);">
                                 <div class="d-flex justify-content-between text-muted small mb-2">
                                     <span>Subtotal</span>
-                                    <span>$100.00</span>
+                                    <span>{{ formatCurrency(grandTotal) }}</span>
                                 </div>
                                 <div class="d-flex justify-content-between text-muted small mb-2">
                                     <span>Shipping</span>
-                                    <span>$5.00</span>
+                                    <span>{{ latestOrderItems[0]?.is_delivery === 2 ? '$2.00' : 'Free' }}</span>
                                 </div>
-                                <!-- <div class="d-flex justify-content-between text-muted small mb-2">
-                                    <span>Tax (10%)</span>
-                                    <span>$10.00</span>
-                                </div> -->
                                 <hr style="border-color: rgba(66,184,131,0.2);">
                                 <div class="d-flex justify-content-between fw-bold">
                                     <span class="text-dark">Total Paid</span>
-                                    <span class="text-main">$115.00</span>
+                                    <span class="text-main">
+                                        {{ formatCurrency(grandTotal + (latestOrderItems[0]?.is_delivery === 2 ? 2 : 0))}}
+                                    </span>
                                 </div>
                             </div>
                         </div>
