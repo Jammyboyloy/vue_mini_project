@@ -4,7 +4,7 @@
       <div class="sidebar-header">
         <div class="brand" :class="{ 'brand-visible': !collapsed }">
           <router-link to="/">
-            <img src="../assets/img/logo vue2.png" alt="" class="object-fit-contain" style="width: 150px;">
+            <img src="../assets/img/logo vue2.png" alt="" class="object-fit-contain" style="width: 130px;">
           </router-link>
         </div>
         <button class="toggle-btn" @click="toggleSidebar">
