@@ -123,7 +123,10 @@
               </tr>
             </tbody>
           </table>
-          <button @click="goCheckOut" class="btn bg-btn fw-medium rounded-5 px-5 ms-auto">
+          <button
+            @click="goCheckOut"
+            class="btn bg-btn fw-medium rounded-5 px-5 ms-auto"
+          >
             Proceed to Checkout
           </button>
         </div>
@@ -138,8 +141,12 @@ import { useCartStore } from "@/stores/cart";
 import emptyCartAnimation from "@/assets/img/empty-cart.json";
 import { onMounted } from "vue";
 import { useRouter } from "vue-router";
+import { useProfileStore } from "@/stores/profile";
+import { useToast } from "vue-toastification";
 let cart = useCartStore();
 const router = useRouter();
+let MyProfileStore = useProfileStore();
+let toast = useToast();
 
 const inc = async (pro) => {
   await cart.addToMyCart(pro.product.id, pro.qty + 1);
@@ -155,7 +162,15 @@ onMounted(() => {
 });
 
 const goCheckOut = () => {
-  router.push("/checkout");
+  const profile = MyProfileStore.myProfile;
+
+  if (!profile.phone || !profile.location) {
+    MyProfileStore.mustEdit = true;
+    router.push({ name: "myProfile" });
+    toast.warning("Phone and Address is require");
+  } else {
+    router.push("/checkout");
+  }
 };
 </script>
 

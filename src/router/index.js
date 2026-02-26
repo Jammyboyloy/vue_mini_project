@@ -30,27 +30,22 @@ const router = createRouter({
           name: "detail",
           component: () => import("../views/products/ProductDetailView.vue"),
         },
+        {
+          path: "checkout",
+          name: "checkout",
+          component: () => import("../views/payments/PaymentView.vue"),
+        },
+        {
+          path: "receipt",
+          name: "receipt",
+          component: () => import("../views/payments/ReceiptView.vue"),
+        },
       ],
     },
     {
       path: "/login",
       name: "login",
       component: () => import("../views/auth/LoginView.vue"),
-    },
-    {
-      path: "/checkout",
-      name: "checkout",
-      component: () => import("../views/payments/PaymentView.vue"),
-    },
-    {
-      path: "/profile",
-      name: "profile",
-      component: () => import("../views/profile/ProfileView.vue"),
-    },
-    {
-      path: "/receipt",
-      name: "receipt",
-      component: () => import("../views/payments/ReceiptView.vue"),
     },
     {
       path: "/dashboard",
