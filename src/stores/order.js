@@ -4,10 +4,9 @@ import { ref, computed } from "vue";
 
 export const useOrderStore = defineStore("order", () => {
   const loading = ref(false);
-  const orderProduct = ref([]); // Master Data (Array 1)
+  const orderProduct = ref([]);
   const myOrder = ref([]);
 
-  // Keep your original pagination object for other orders
   const pagination = ref({
     has_page: true,
     on_first_page: true,
@@ -19,16 +18,13 @@ export const useOrderStore = defineStore("order", () => {
     last_page: 0,
   });
 
-  // --- NEW LOGIC FOR PROCESSED PAGINATION ---
   const processedCurrentPage = ref(1);
   const itemsPerPage = 5;
 
-  // 1. Get ALL processed from the master list
   const allProcessed = computed(() =>
     orderProduct.value.filter((item) => item.status === 2 || item.status === 3)
   );
 
-  // 2. Filtered list for the table (Status 2 or 3 + sliced)
   const processedOrders = computed(() => {
     const start = (processedCurrentPage.value - 1) * itemsPerPage;
     const end = start + itemsPerPage;
@@ -81,7 +77,7 @@ export const useOrderStore = defineStore("order", () => {
     loading.value = true;
     try {
       const res = await api.get(
-        `/api/profile/payment-check?page=${page}&per_page=${per_page}`,
+        `/api/profile/purchased?page=${page}&per_page=${per_page}`,
       );
       myOrder.value = res.data.data;
       if (res.data.paginate) {

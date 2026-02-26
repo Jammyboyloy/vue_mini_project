@@ -31,7 +31,7 @@
       </div>
 
       <!-- RIGHT BUTTONS -->
-      <div class="col-lg-6 d-flex justify-content-end align-items-start mt-4 gap-3">
+      <div class="col-lg-6 d-flex justify-content-end align-items-center gap-3">
         <div class="skeleton btn"></div>
         <div class="skeleton btn danger"></div>
       </div>
@@ -148,13 +148,13 @@
 }
 
 .btn {
-  width: 120px;
+  width: 170px;
   height: 40px;
   border-radius: 50px;
 }
 
 .btn.danger {
-  width: 100px;
+  width: 160px;
 }
 
 .section-title {

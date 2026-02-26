@@ -1,5 +1,12 @@
 <template>
   <div class="bg-light">
+    <div v-if="isLoading" class="full-loader">
+      <div class="loader">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </div>
+    </div>
     <div
       class="d-flex justify-content-center align-items-center min-vh-100 py-4 shadow-sm"
     >
@@ -14,6 +21,7 @@
             input-placeholder="Enter your email"
             input-icon="Mail"
             v-model="email"
+            autocomplete="username"
           />
           <p v-if="err.email" class="text-danger m-0">{{ err.email }}</p>
 
@@ -22,8 +30,9 @@
             <input
               :type="showPassword ? 'text' : 'password'"
               v-model="password"
-              class="form-control bg-prime fs-text ps-7"
+              class="form-control bg-white ps-7"
               placeholder="Enter your password"
+              autocomplete="current-password"
             />
 
             <LockKeyhole
@@ -58,7 +67,9 @@
               v-if="isLoading"
               class="spinner-border spinner-border-sm me-2 text-white"
             ></span>
-            <span class="text-white">{{ isLoading ? "Signing In..." : "Sign In" }}</span>
+            <span class="text-white">{{
+              isLoading ? "Signing In..." : "Sign In"
+            }}</span>
           </button>
         </form>
         <div class="d-flex gap-3 mt-3 align-items-center text-secondary">
@@ -68,7 +79,9 @@
         </div>
         <p class="m-0 fs-6 mt-2 text-center">
           Don't have an account?
-          <router-link to="/register" class="ms-2 text-main">Register</router-link>
+          <router-link to="/register" class="ms-2 text-main"
+            >Register</router-link
+          >
         </p>
       </div>
     </div>
@@ -82,6 +95,7 @@ import { useRouter } from "vue-router";
 import { isEmail, require, validates } from "@/utils/validate";
 import BaseInput from "@/components/BaseInput.vue";
 import { useToast } from "vue-toastification";
+import { watch } from "vue";
 let toast = useToast();
 
 const email = ref("");
@@ -98,6 +112,17 @@ const togglePassword = () => {
 const err = reactive({
   email: "",
   password: "",
+});
+
+watch(email, (newValue) => {
+  err.email = validates(newValue, [
+    (v) => require(v, "Email is require"),
+    (v) => isEmail(v, "Wrong Format Email"),
+  ]);
+});
+
+watch(password, (newValue) => {
+  err.password = require(newValue, "Password is require");
 });
 
 function validate() {
@@ -117,6 +142,7 @@ async function handleLogin() {
   try {
     await auth.login(email.value, password.value);
     router.push("/");
+    toast.success("Login Successfully!");
   } catch (error) {
     toast.error(error.message);
   } finally {

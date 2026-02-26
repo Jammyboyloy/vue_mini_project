@@ -100,6 +100,41 @@
                 </template>
               </Menu>
             </div>
+            <BaseModal
+              v-if="open"
+              @closeModal="toggleModal"
+              position="justify-content-center"
+            >
+              <template #header>
+                <h5 class="modal-title mx-auto">Sign out</h5>
+              </template>
+              <template #body>
+                <p class="text-center mb-0">
+                  Are you sure you want to sign out?
+                </p>
+              </template>
+              <template #footer>
+                <button
+                  type="button"
+                  class="btn btn-secondary rounded-pill py-2 px-6"
+                  @click="toggleModal"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-danger rounded-pill py-2 px-6"
+                  @click="handleLogout"
+                  :disabled="loading"
+                >
+                  <span
+                    v-if="loading"
+                    class="spinner-border spinner-border-sm me-2"
+                  ></span>
+                  Sign out
+                </button>
+              </template>
+            </BaseModal>
           </div>
         </div>
       </div>
@@ -109,12 +144,15 @@
 
 <script setup>
 import { h, onMounted } from "vue";
-import { LogOut, ShoppingBag, User, Package } from "lucide-vue-next";
+import { LogOut, ShoppingBag, User, Store } from "lucide-vue-next";
 import Menu from "primevue/menu";
 import OverlayBadge from "primevue/overlaybadge";
+import BaseModal from "./BaseModal.vue";
 import { useRouter } from "vue-router";
 import { useCartStore } from "@/stores/cart";
 import { useProfileStore } from "@/stores/profile";
+import { useAuthStore } from "@/stores/auth";
+import { ref } from "vue";
 
 const router = useRouter();
 const goMyCart = () => {
@@ -123,6 +161,7 @@ const goMyCart = () => {
 
 const cart = useCartStore();
 const profile = useProfileStore();
+const auth = useAuthStore();
 
 onMounted(() => {
   cart.fetchMyCart();
@@ -134,23 +173,47 @@ const profileItems = [
     label: "Profile",
     icon: User,
     class: "item-gap",
-    command: () => router.push("/profile"),
+    command: () => router.push("/dashboard/myProfile"),
   },
   {
     label: "My Order",
     icon: () => h(ShoppingBag, { size: 22 }),
     class: "item-gap",
-    command: () => router.push("/profile"),
+    command: () => router.push("/dashboard/myOrder"),
   },
   {
     label: "My Product",
-    icon: () => h(Package, { size: 22 }),
+    icon: () => h(Store, { size: 22 }),
     class: "item-gap",
-    command: () => router.push("/profile"),
+    command: () => router.push("/dashboard"),
   },
   { separator: true, class: "item-gap" },
-  { label: "Logout", icon: LogOut },
+  {
+    label: "Logout",
+    icon: LogOut,
+    command: () => toggleModal(),
+  },
 ];
+
+const open = ref(false);
+let loading = ref(false);
+const toggleModal = () => {
+  if (loading.value) return;
+  open.value = !open.value;
+};
+
+async function handleLogout() {
+  loading.value = true;
+  try {
+    await auth.logout();
+    open.value = false;
+    router.push("/login");
+  } catch (error) {
+    console.error("Logout failed:", error);
+  } finally {
+    loading.value = false;
+  }
+}
 </script>
 
 <style scoped>
@@ -209,12 +272,7 @@ const profileItems = [
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    90deg,
-    #e2e2e2 25%,
-    #f0f0f0 50%,
-    #e2e2e2 75%
-  );
+  background: linear-gradient(90deg, #e2e2e2 25%, #f0f0f0 50%, #e2e2e2 75%);
   background-size: 200% 100%;
   animation: shimmer 1.2s infinite linear;
 }
@@ -232,7 +290,11 @@ const profileItems = [
 }
 
 @keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
 </style>

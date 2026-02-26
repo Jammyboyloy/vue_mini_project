@@ -2,8 +2,9 @@
   <div>
     <div class="position-relative text-secondary mb-2">
       <input
+        v-bind="$attrs"
         :type="inputType"
-        class="form-control bg-transparent fs-text ps-7 py-2"
+        class="form-control bg-white ps-7 py-2"
         :placeholder="inputPlaceholder"
         v-model="model"
         :disabled="isDisabled"
@@ -18,6 +19,10 @@
 </template>
 
 <script setup>
+defineOptions({
+  inheritAttrs: false,
+});
+
 const model = defineModel();
 defineProps({
   inputType: {
@@ -43,7 +48,6 @@ defineProps({
 .tran-y {
   transform: translateY(-50%);
 }
-
 .icon-input {
   position: absolute;
   top: 50%;

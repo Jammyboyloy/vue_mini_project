@@ -32,7 +32,7 @@
             <th class="border-0 text-center">Amount Info</th>
             <th class="border-0 text-center">Payment Proof</th>
             <th class="border-0 text-center">Status</th>
-            <th class="border-0 text-end pe-4">Actions</th>
+            <th class="border-0 text-center ps-12">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -104,16 +104,16 @@
               <div class="d-flex justify-content-end gap-3">
                 <button
                   @click="openModal(item, 'approve')"
-                  class="btn btn-sm bg-btn border-0 text-white rounded-pill px-3 fw-medium"
+                  class="btn text-main border-0"
                   :disabled="!item.transaction_file"
                 >
-                  Approve
+                  <circle-check size="35" />
                 </button>
                 <button
                   @click="openModal(item, 'reject')"
-                  class="btn btn-sm btn-danger rounded-pill px-3 fw-medium"
+                  class="btn text-danger border-0"
                 >
-                  Reject
+                  <circle-x size="35" />
                 </button>
               </div>
             </td>
