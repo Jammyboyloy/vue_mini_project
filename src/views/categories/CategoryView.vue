@@ -48,6 +48,9 @@
             v-model="categoryName"
             :isDisabled="isDisabled"
           />
+          <p v-if="err.category" class="text-danger m-0">
+            {{ err.category }}
+          </p>
         </template>
         <template #footer>
           <button
@@ -78,10 +81,11 @@
 import BaseModal from "@/components/BaseModal.vue";
 import BaseTable from "@/components/BaseTable.vue";
 import { useCategoryStore } from "@/stores/category";
-import { onMounted, ref } from "vue";
+import { onMounted, reactive, ref, watch } from "vue";
 import BaseInput from "@/components/BaseInput.vue";
 import api from "@/api/https";
 import { useToast } from "vue-toastification";
+import { require } from "@/utils/validate";
 let cate = useCategoryStore();
 let per_page = ref(5);
 let columns = [
@@ -104,6 +108,8 @@ onMounted(async () => {
 
 //create category, update category, delete category
 async function handleAction() {
+    if (!validate()) return;
+
   loading.value = true;
   try {
     if (isEdit.value) {
@@ -136,7 +142,23 @@ const closeModal = () => {
   showModal.value = false;
 };
 
+const err = reactive({
+  category: "",
+})
+
+watch(categoryName, (newValue) => {
+  err.category = require(newValue, "Category name is required");
+});
+
+function validate() {
+  err.category = require(categoryName.value, "Category name is required");
+  return !err.category;
+}
+
+
+
 const handleCreate = () => {
+  err.category = "";
   showModal.value = true;
   modalTile.value = "Create Category";
   modalConfirm.value = "Create";
