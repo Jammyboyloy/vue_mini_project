@@ -4,10 +4,11 @@ import CardSkeleton from "@/components/CardSkeleton.vue";
 import { useCartStore } from "@/stores/cart";
 import { useProductStore } from "@/stores/product";
 import { onMounted, ref, watch } from "vue";
+import { useRouter } from "vue-router";
 
 const product = useProductStore();
 const cart = useCartStore();
-const sortDir = ref("");
+const router = useRouter();
 
 onMounted(() => {
   product.fetchProduct();
@@ -17,21 +18,25 @@ const handleCart = (id) => {
   cart.addToMyCart(id, cart.countQty);
 };
 
-async function loadProduct() {
-  await product.fetchProduct({
-    sortDir: sortDir.value,
-  });
-}
-
-watch([sortDir], loadProduct, { immediate: true });
+const handleBuyNow = (id) => {
+  cart.addToMyCart(id, cart.countQty);
+  router.push("/myCart");
+};
 </script>
 
 <template>
+
+   <div v-if="cart.loadingAdd" class="full-loader">
+      <div class="loader">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </div>
+    </div>
   <!-- HERO -->
   <section class="hero-section">
     <div class="container-lg px-4 h-100">
       <div class="row align-items-center min-vh-100 g-5">
-
         <!-- LEFT -->
         <div class="col-lg-6">
           <div class="hero-badge">Spring 2025 Collection</div>
@@ -42,15 +47,17 @@ watch([sortDir], loadProduct, { immediate: true });
           </h1>
 
           <p class="hero-text">
-
-            Discover millions of products from trusted sellers worldwide. Shop the latest trends at wholesale prices with fast, reliable shipping.
-
-
+            Discover millions of products from trusted sellers worldwide. Shop
+            the latest trends at wholesale prices with fast, reliable shipping.
           </p>
 
           <div class="hero-actions">
-            <button class="btn-primary rounded-pill">Shop Collection →</button>
-            <button class="btn btn-outline-success fw-bold rounded-pill">Our Story</button>
+            <button class="btn border-0 bg-btn rounded-pill border-0 px-6">
+              Shop Collection
+            </button>
+            <button class="btn btn-outline-success fw-bold rounded-pill px-5">
+              Our Story
+            </button>
           </div>
 
           <div class="hero-stats">
@@ -70,45 +77,79 @@ watch([sortDir], loadProduct, { immediate: true });
         </div>
 
         <!-- RIGHT -->
-        <div class="col-lg-6 position-relative d-flex justify-content-center hero-image-wrap">
-          <img src="https://i.pinimg.com/736x/e2/d3/31/e2d3318fd4dd2e7f49ccffa3d5ca6f36.jpg" class="hero-blob" alt="" />
+        <div
+          class="col-lg-6 position-relative d-flex justify-content-center hero-image-wrap"
+        >
+          <img
+            src="https://i.pinimg.com/736x/e2/d3/31/e2d3318fd4dd2e7f49ccffa3d5ca6f36.jpg"
+            class="hero-blob"
+            alt=""
+          />
 
-          <div class="bg-white px-3 rounded-3 py-3 shadow-lg position-absolute d-flex align-items-center gap-2"
-            style="bottom:2rem;left:0">
-            <span style="font-size:1.4rem">🌿</span>
+          <div
+            class="bg-white px-3 rounded-3 py-3 shadow-lg position-absolute d-flex align-items-center gap-2"
+            style="bottom: 2rem; left: 0"
+          >
+            <span style="font-size: 1.4rem">🌿</span>
             <div>
-              <div style="font-size:0.6rem;letter-spacing:0.1em">THIS WEEK</div>
-              <div class="fw-bold" style="font-size:0.9rem;">180 New Items</div>
+              <div style="font-size: 0.6rem; letter-spacing: 0.1em">
+                THIS WEEK
+              </div>
+              <div class="fw-bold" style="font-size: 0.9rem">180 New Items</div>
             </div>
           </div>
-          <div class="bg-success text-center text-white px-3 rounded-3 py-3 shadow-lg position-absolute"
-            style="top:2rem;right:0">
+          <div
+            class="bg-success text-center text-white px-3 rounded-3 py-3 shadow-lg position-absolute"
+            style="top: 2rem; right: 0"
+          >
             <div class="fs-3 fw-bold lh-1">4.9</div>
-            <div style="font-size:0.62rem;opacity:0.6">★★★★★ Rated</div>
+            <div style="font-size: 0.62rem; opacity: 0.6">★★★★★ Rated</div>
           </div>
         </div>
-
       </div>
     </div>
   </section>
-
 
   <!-- MARQUEE -->
   <!-- marquee  -->
   <div class="marquee-wrap">
     <div class="marquee-track">
-      <span class="marquee-item">Free Shipping Over $100 <span class="m-sep">✦</span></span>
-      <span class="marquee-item">Sustainable Packaging <span class="m-sep">✦</span></span>
-      <span class="marquee-item">New Arrivals Every Week <span class="m-sep">✦</span></span>
-      <span class="marquee-item">30-Day Easy Returns <span class="m-sep">✦</span></span>
-      <span class="marquee-item">Carbon-Neutral Delivery <span class="m-sep">✦</span></span>
-      <span class="marquee-item">Free Shipping Over $100 <span class="m-sep">✦</span></span>
-      <span class="marquee-item">Sustainable Packaging <span class="m-sep">✦</span></span>
-      <span class="marquee-item">New Arrivals Every Week <span class="m-sep">✦</span></span>
-      <span class="marquee-item">30-Day Easy Returns <span class="m-sep">✦</span></span>
-      <span class="marquee-item">Carbon-Neutral Delivery <span class="m-sep">✦</span></span>
-      <span class="marquee-item">Carbon-Neutral Delivery <span class="m-sep">✦</span></span>
-      <span class="marquee-item">Carbon-Neutral Delivery <span class="m-sep">✦</span></span>
+      <span class="marquee-item"
+        >Free Shipping Over $100 <span class="m-sep">✦</span></span
+      >
+      <span class="marquee-item"
+        >Sustainable Packaging <span class="m-sep">✦</span></span
+      >
+      <span class="marquee-item"
+        >New Arrivals Every Week <span class="m-sep">✦</span></span
+      >
+      <span class="marquee-item"
+        >30-Day Easy Returns <span class="m-sep">✦</span></span
+      >
+      <span class="marquee-item"
+        >Carbon-Neutral Delivery <span class="m-sep">✦</span></span
+      >
+      <span class="marquee-item"
+        >Free Shipping Over $100 <span class="m-sep">✦</span></span
+      >
+      <span class="marquee-item"
+        >Sustainable Packaging <span class="m-sep">✦</span></span
+      >
+      <span class="marquee-item"
+        >New Arrivals Every Week <span class="m-sep">✦</span></span
+      >
+      <span class="marquee-item"
+        >30-Day Easy Returns <span class="m-sep">✦</span></span
+      >
+      <span class="marquee-item"
+        >Carbon-Neutral Delivery <span class="m-sep">✦</span></span
+      >
+      <span class="marquee-item"
+        >Carbon-Neutral Delivery <span class="m-sep">✦</span></span
+      >
+      <span class="marquee-item"
+        >Carbon-Neutral Delivery <span class="m-sep">✦</span></span
+      >
     </div>
   </div>
   <!-- NEW ARRIVALS -->
@@ -120,25 +161,27 @@ watch([sortDir], loadProduct, { immediate: true });
           <h2>New <span>Arrivals</span></h2>
           <p>Fresh picks added this week</p>
         </div>
-        <router-link to="/shopping" class="text-main">View All →</router-link>
+        <router-link
+          to="/shopping"
+          class="text-white nav-link btn bg-btn px-5 rounded-pill py-2"
+          >View All</router-link
+        >
       </div>
 
-      <div v-if="product.loading" class="row g-3 ">
-        <div class="col-lg-3 col-md-6 col-12" v-for="n in 8" :key="n">
+      <div v-if="product.loading" class="row g-3">
+        <div class="col-lg-3 col-md-6 col-12" v-for="n in 4" :key="n">
           <CardSkeleton />
         </div>
       </div>
 
       <div v-else class="row g-3">
-        <div class="col-lg-3 col-md-6 col-12" v-for="pro in product.productList.slice(0, 4)" :key="pro.id">
-          <BaseCard :product="pro" @add-to-cart="handleCart" />
+        <div
+          class="col-lg-3 col-md-6 col-12"
+          v-for="pro in product.productList.slice(0, 4)"
+          :key="pro.id"
+        >
+          <BaseCard :product="pro" @add-to-cart="handleCart" @buy-now="handleBuyNow"/>
         </div>
-      </div>
-
-      <div class="text-center mt-5 px-2">
-        <router-link to="/shopping" class="btn-primary rounded-pill px-4">
-          Explore All Products →
-        </router-link>
       </div>
     </div>
   </section>
@@ -147,106 +190,122 @@ watch([sortDir], loadProduct, { immediate: true });
   <section class="promotion py-6 px-4">
     <div class="container">
       <div class="row promo-wrapper">
-
         <div class="col-6 promo-content g-3">
           <div class="promo-badge">🌿 Seasonal Sale</div>
 
-          <h2>
-            Up to <span>40% Off</span>
-          </h2>
+          <h2>Up to <span>40% Off</span></h2>
 
           <p>
-            Sustainable essentials designed for everyday comfort and long-lasting wear.
+            Sustainable essentials designed for everyday comfort and
+            long-lasting wear.
           </p>
 
-          <router-link to="/shopping" class=" btn-secondary rounded-pill me-3">
-            Shop Sale →
+          <router-link
+            to="/dashboard/createProduct"
+            class="btn btn-light px-6 py-3 rounded-pill me-3"
+          >
+            Start Selling
           </router-link>
-          <router-link to="/shopping" class=" btn-primary rounded-pill">
+          <router-link
+            to="/shopping"
+            class="btn border-0 bg-btn px-6 py-3 rounded-pill"
+          >
             View Collection
           </router-link>
-
         </div>
 
         <div class="col-6 promo-image">
-          <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1200&q=80" alt="Sale" />
+          <img
+            src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1200&q=80"
+            alt="Sale"
+          />
         </div>
-
       </div>
     </div>
   </section>
-
 
   <!-- ABOUT -->
   <section class="about-section py-6 px-4">
     <div class="container">
       <div class="about-header mt-3">
-          <h1 class="text-center">
-            Why Shopping With Us?
-          </h1>
-          <h4 class="text-center text-muted">Your trusted marketplace for quality fashion at unbeatable prices</h4>
+        <h1 class="text-center">Why Shopping With Us?</h1>
+        <h4 class="text-center text-muted mb-4">
+          Your trusted marketplace for quality fashion at unbeatable prices
+        </h4>
       </div>
 
       <!-- Feature Cards -->
-    <div class="row features-row">
-      <div class="col-3">
-        <div class="card feature-card">
-          <div class="about-icon m-auto ">
-            <users/>
+      <div class="row features-row">
+        <div class="col-3">
+          <div class="card feature-card">
+            <div class="about-icon m-auto">
+              <users />
+            </div>
+            <h3
+              class="card-title text-center mt-2"
+              style="color: black; font-size: 32px; font-weight: 700"
+            >
+              12K+
+            </h3>
+            <p class="card-text text-muted text-center">Happy customer</p>
           </div>
-          <h3 class="card-title text-center" style="color:black; font-size: 32px; font-weight: 700;">12K+</h3>
-          <p class="card-text text-muted text-center">
-            Happy customer
-          </p>
+        </div>
+
+        <div class="col-3">
+          <div class="card feature-card">
+            <div class="about-icon m-auto">
+              <box />
+            </div>
+            <h3
+              class="card-title text-center mt-2"
+              style="color: black; font-size: 32px; font-weight: 700"
+            >
+              500+
+            </h3>
+            <p class="card-text text-muted text-center">Quality Products</p>
+          </div>
+        </div>
+
+        <div class="col-3">
+          <div class="card feature-card">
+            <div class="about-icon m-auto">
+              <award />
+            </div>
+            <h3
+              class="card-title text-center mt-2"
+              style="color: black; font-size: 32px; font-weight: 700"
+            >
+              4.9★
+            </h3>
+            <p class="card-text text-muted text-center">Average Rating</p>
+          </div>
+        </div>
+
+        <div class="col-3">
+          <div class="card feature-card">
+            <div class="about-icon m-auto">
+              <move-up-right />
+            </div>
+            <h3
+              class="card-title text-center mt-2"
+              style="color: black; font-size: 32px; font-weight: 700"
+            >
+              50+
+            </h3>
+            <p class="card-text text-muted text-center">Countries Served</p>
+          </div>
         </div>
       </div>
 
-      <div class="col-3">
-        <div class="card feature-card">
-          <div class="about-icon m-auto ">
-            <box/>
-          </div>
-          <h3 class="card-title text-center" style="color:black; font-size: 32px; font-weight: 700;">500+</h3>
-          <p class="card-text text-muted text-center">
-            Quality Products
-          </p>
-        </div>
-      </div>
-
-      <div class="col-3">
-        <div class="card feature-card">
-          <div class="about-icon m-auto ">
-            <award/>
-          </div>
-          <h3 class="card-title text-center" style="color:black; font-size: 32px; font-weight: 700;">4.9★</h3>
-          <p class="card-text text-muted text-center">
-            Average Rating
-          </p>
-        </div>
-      </div>
-
-      <div class="col-3">
-        <div class="card feature-card">
-          <div class="about-icon m-auto ">
-            <move-up-right/>
-          </div>
-          <h3 class="card-title text-center" style="color:black; font-size: 32px; font-weight: 700;">50+</h3>
-          <p class="card-text text-muted text-center">
-           Countries Served
-          </p>
-        </div>
-      </div>
-    </div>
-
-
-=
-      <div class="row about-wrapper gx-5">
-
+      <div class="row about-wrapper gx-5 bg-light">
         <!-- Image -->
         <div class="col-6">
           <div class="card image-card">
-            <img src="https://images.unsplash.com/photo-1758520387281-e897b134664f?w=1080&q=80"
-              alt="Happy customers shopping" class="card-img" />
+            <img
+              src="https://images.unsplash.com/photo-1758520387281-e897b134664f?w=1080&q=80"
+              alt="Happy customers shopping"
+              class="card-img"
+            />
 
             <div class="since-badge">
               <span class="year">2020</span>
@@ -261,8 +320,8 @@ watch([sortDir], loadProduct, { immediate: true });
             <h2>Your One-Stop Fashion Marketplace</h2>
 
             <p>
-              Since 2020, we've been connecting fashion lovers with trusted sellers
-              worldwide, offering trendy and high-quality products.
+              Since 2020, we've been connecting fashion lovers with trusted
+              sellers worldwide, offering trendy and high-quality products.
             </p>
 
             <p>
@@ -270,82 +329,85 @@ watch([sortDir], loadProduct, { immediate: true });
               reliability, affordability, and great service.
             </p>
             <p>
-              Every product is carefully vetted, every seller is verified, and every transaction is protected. Shop with confidence and discover your next favorite style today.
+              Every product is carefully vetted, every seller is verified, and
+              every transaction is protected. Shop with confidence and discover
+              your next favorite style today.
             </p>
             <p>
               With millions of customers across 50+ countries, we are known for
               reliability, affordability, and great service.
             </p>
 
-            <a href="#" class="btn-primary">Start Shopping Now</a>
+            <router-link class="btn border-0 bg-btn px-6 py-3 rounded-pill" to="/shopping">
+              Start Shopping Now
+            </router-link>
           </div>
         </div>
-
       </div>
     </div>
   </section>
 
   <!-- FEATURES -->
-  <section class="features-section">
+  <section class="features-section pt-3 pb-5 m-0">
+    <h1 class="text-center fw-bold">Our Core Promises</h1>
+    <h6 class="text-center mb-5">Simple, secure, and reliable shopping.</h6>
     <div class="container">
-
-       <!-- Feature Cards -->
-    <div class="row features-row">
-      <div class="col-3">
-        <div class="card feature-card">
-          <div class="feature-icon">
-            <shield-check/>
+      <!-- Feature Cards -->
+      <div class="row features-row">
+        <div class="col-3">
+          <div class="card feature-card">
+            <div class="feature-icon">
+              <shield-check />
+            </div>
+            <h3 class="card-title">Buyer Protection</h3>
+            <p class="card-text">
+              100% secure payment with money-back guarantee on all orders.
+            </p>
           </div>
-          <h3 class="card-title">Buyer Protection</h3>
-          <p class="card-text">
-            100% secure payment with money-back guarantee on all orders.
-          </p>
+        </div>
+
+        <div class="col-3">
+          <div class="card feature-card">
+            <div class="feature-icon">
+              <truck />
+            </div>
+            <h3 class="card-title">Fast Shipping</h3>
+            <p class="card-text">
+              Free worldwide shipping on orders over $50. Delivery in 5–7 days.
+            </p>
+          </div>
+        </div>
+
+        <div class="col-3">
+          <div class="card feature-card">
+            <div class="feature-icon">
+              <headphones />
+            </div>
+            <h3 class="card-title">24/7 Support</h3>
+            <p class="card-text">
+              Dedicated customer service team ready to help you anytime.
+            </p>
+          </div>
+        </div>
+
+        <div class="col-3">
+          <div class="card feature-card">
+            <div class="feature-icon">
+              <credit-card />
+            </div>
+            <h3 class="card-title">Secure Payment</h3>
+            <p class="card-text">
+              Multiple payment options with encrypted transactions.
+            </p>
+          </div>
         </div>
       </div>
-
-      <div class="col-3">
-        <div class="card feature-card">
-          <div class="feature-icon">
-            <truck/>
-          </div>
-          <h3 class="card-title">Fast Shipping</h3>
-          <p class="card-text">
-            Free worldwide shipping on orders over $50. Delivery in 5–7 days.
-          </p>
-        </div>
-      </div>
-
-      <div class="col-3">
-        <div class="card feature-card">
-          <div class="feature-icon">
-            <headphones/>
-          </div>
-          <h3 class="card-title">24/7 Support</h3>
-          <p class="card-text">
-            Dedicated customer service team ready to help you anytime.
-          </p>
-        </div>
-      </div>
-
-      <div class="col-3">
-        <div class="card feature-card">
-          <div class="feature-icon">
-            <credit-card/>
-          </div>
-          <h3 class="card-title">Secure Payment</h3>
-          <p class="card-text">
-            Multiple payment options with encrypted transactions.
-          </p>
-        </div>
-      </div>
-    </div>
 
       <div class="trusted-banner">
         <span class="trusted-label">TRUSTED BY</span>
         <h2>12,000+ Happy Customers Worldwide</h2>
         <p>Join thousands who trust us every day</p>
       </div>
-
     </div>
   </section>
 </template>
@@ -405,7 +467,11 @@ watch([sortDir], loadProduct, { immediate: true });
   content: "";
   position: absolute;
   inset: -30px;
-  background: radial-gradient(circle, rgba(66, 184, 131, 0.18), transparent 60%);
+  background: radial-gradient(
+    circle,
+    rgba(66, 184, 131, 0.18),
+    transparent 60%
+  );
   z-index: -1;
 }
 
@@ -520,12 +586,11 @@ watch([sortDir], loadProduct, { immediate: true });
 }
 
 /* ABOUT */
-.about-header h1{
+.about-header h1 {
   font-size: 50px;
   line-height: 1.7;
   color: #070707;
   font-weight: 900;
-
 }
 .about-wrapper {
   align-items: center;
@@ -534,7 +599,6 @@ watch([sortDir], loadProduct, { immediate: true });
   background: white;
   border-bottom: 1px solid rgb(225, 209, 209);
   border-radius: 30px;
-
 }
 
 .image-card {
@@ -596,40 +660,13 @@ watch([sortDir], loadProduct, { immediate: true });
   margin-bottom: 16px;
 }
 
-.btn-primary {
-  display: inline-block;
-  padding: 14px 28px;
-  background: #009e60;
-  color: #fff;
-  font-weight: 600;
-  border-radius: 999px;
-  transition: background 0.3s;
-}
-.btn-secondary {
-  display: inline-block;
-  padding: 14px 28px;
-  background: white;
-  color: #009e60;
-  font-weight: 600;
-  border-radius: 999px;
-  transition: background 0.3s;
-}
-
-
-.btn-primary:hover {
-  background: #007a4a;
-}
-.btn-secondary:hover {
-  background: rgb(217, 214, 214);
-}
-
 /* FEATURES */
 .features-section {
   padding: 100px 0;
 }
 
 .features-row {
-  display: flex;  
+  display: flex;
   margin-bottom: 80px;
 }
 
@@ -680,7 +717,6 @@ watch([sortDir], loadProduct, { immediate: true });
 /* Section */
 /* ANIMATION */
 @keyframes morphBlob {
-
   0%,
   100% {
     border-radius: 40% 60% 60% 40%;

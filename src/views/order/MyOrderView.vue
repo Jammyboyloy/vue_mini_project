@@ -171,7 +171,7 @@
               </div>
               <div class="col-12 mt-2" v-if="selectedOrder.address">
                 <label class="text-muted extra-small d-block">Phone</label>
-                <p class="small mb-0">{{ selectedOrder?.phone ?? "N/A" }}</p>
+                <p class="small mb-0">{{ selectedOrder?.seller?.phone ?? "N/A" }}</p>
               </div>
             </div>
           </div>
