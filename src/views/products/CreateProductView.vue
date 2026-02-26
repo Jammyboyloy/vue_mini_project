@@ -107,7 +107,7 @@
           <div class="col-md-6">
             <label class="form-label text-secondary fw-bold">Description :</label>
             <div class="p-3 bg-light rounded-4 form-card-height d-flex flex-column">
-              <textarea v-model="form.content" class="ps-3 pt-3 form-control rounded-3 flex-grow-1"
+              <textarea v-model="form.description" class="ps-3 pt-3 form-control rounded-3 flex-grow-1"
                 placeholder="Enter Description"></textarea>
             </div>
             <p v-if="err.description" class="text-danger m-0 mt-2">{{ err.description }}</p>
@@ -154,7 +154,8 @@ import Select from "primevue/select";
 import api from "@/api/https";
 import { notify } from "@/utils/toast";
 import { useRouter } from "vue-router";
-import { require } from "@/utils/validate";
+import { require,isPrice, validates, checkContent } from "@/utils/validate";
+
 let router = useRouter();
 let toast = notify(router);
 let loading = ref(false);
@@ -172,7 +173,6 @@ const form = ref({
   condition: "",
   story: "",
   detail: "",
-  content: "",
   description: "",
   image: null,
 });
@@ -225,8 +225,7 @@ async function submitForm() {
   formData.append("condition", form.value.condition);
   formData.append("story", form.value.story);
   formData.append("detail", form.value.detail);
-  formData.append("content", form.value.content);
-  formData.append("content", form.value.description);
+  formData.append("description", form.value.description);
   if (form.value.image) {
     formData.append("image", form.value.image);
   }
@@ -240,7 +239,6 @@ async function submitForm() {
       condition: "",
       story: "",
       detail: "",
-      content: "",
       description: "",
       image: null,
     };
@@ -260,7 +258,6 @@ const err = reactive({
   condition: "",
   story: "",
   detail: "",
-  content: "",
   description: "",
   image: "",
 });
@@ -276,12 +273,15 @@ watch(
 watch(
   () => form.value.price,
   (newValue) => {
-    err.price = require(newValue, "Price is required");
+    err.price = validates(newValue, [
+      (v) => require(v, "Price is required"),
+      (v) => isPrice(v, "Price must be a number"),
+    ]);
   }
 );
 
 watch(
-  () => form.value.category,
+  () => form.value.category_ids,
   (newValue) => {
     err.category = require(newValue, "Category is required");
   }
@@ -309,16 +309,19 @@ watch(
 );
 
 watch(
-  () => form.value.content,
+  () => form.value.description,
   (newValue) => {
-    err.content = require(newValue, "Content is required");
+    err.description = validates(newValue, [
+      (v) => require(v, "Description is required"),
+      (v) => checkContent(v, "Description must be at least 10 characters"),
+    ]);
   }
 );
 
 watch(
-  () => form.value.description,
+  () => form.value.image,
   (newValue) => {
-    err.description = require(newValue, "Description is required");
+    err.image = require(newValue, "Image is required");
   }
 );
 
@@ -326,14 +329,19 @@ watch(
 
 function validate() {
   err.title = require(form.value.title, "Title is required");
-  err.price = require(form.value.price, "Price is required");
-  err.category = require(form.value.category, "Category is required");
+  err.price = validates(form.value.price, [
+    (v) => require(v, "Price is required"),
+    (v) => isPrice(v, "Price must be a number"),
+  ]);
+  err.category = require(form.value.category_ids, "Category is required");
   err.condition = require(form.value.condition, "Condition is required");
   err.story = require(form.value.story, "Story is required");
   err.detail = require(form.value.detail, "Detail is required");
-  err.content = require(form.value.content, "Content is required");
   err.image = require(form.value.image, "Image is required");
-  err.description = require(form.value.description, "Description is required");
+  err.description = validates(form.value.description, [
+    (v) => require(v, "Description is required"),
+    (v) => checkContent(v, "Description must be at least 10 characters"),
+  ]);
 
   return (
     !err.title &&
@@ -342,7 +350,6 @@ function validate() {
     !err.condition &&
     !err.story &&
     !err.detail &&
-    !err.content &&
     !err.image &&
     !err.description
   );

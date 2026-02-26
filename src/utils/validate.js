@@ -20,6 +20,12 @@ export function checkContent(value, message) {
   return value.trim().length >= 10 ? "" : message;
 }
 
+export function isPrice(value, message) {
+  return /^\d+(\.\d{1,2})?$/.test(String(value).trim())
+    ? ""
+    : message;
+}
+
 export function checkFileSize(value, message = "File size must be less than 1MB", maxSizeMB = 1) {
   const sizeInMB = value.size / 1024 / 1024; // convert bytes to MB
   return sizeInMB <= maxSizeMB ? "" : message;
