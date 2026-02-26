@@ -254,7 +254,11 @@
                 inputIcon="User"
                 v-model="editProfile.name"
               />
+              <p v-if="err.name" class="text-danger m-0">
+                {{ err.name }}
+              </p>
             </div>
+
             <div class="mb-3">
               <label class="mb-2">Email</label>
               <BaseInput
@@ -262,6 +266,9 @@
                 inputIcon="Mail"
                 v-model="editProfile.email"
               />
+              <p v-if="err.email" class="text-danger m-0">
+                {{ err.email }}
+              </p>
             </div>
             <div class="mb-3">
               <label class="mb-2">Location</label>
@@ -270,6 +277,9 @@
                 inputIcon="MapPin"
                 v-model="editProfile.location"
               />
+              <p v-if="err.location" class="text-danger m-0">
+                {{ err.location }}
+              </p>
             </div>
             <div class="mb-3">
               <label class="mb-2">Phone</label>
@@ -278,6 +288,9 @@
                 inputIcon="Phone"
                 v-model="editProfile.phone"
               />
+              <p v-if="err.phone" class="text-danger m-0">
+                {{ err.phone }}
+              </p>
             </div>
           </template>
           <template #footer>
@@ -337,8 +350,8 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
-import { useRouter } from "vue-router";
+import { onMounted, ref, watch, reactive } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
 import { useProfileStore } from "@/stores/profile";
 import { useAuthStore } from "@/stores/auth";
@@ -347,16 +360,18 @@ import api from "@/api/https";
 import BaseModal from "@/components/BaseModal.vue";
 import BaseInput from "@/components/BaseInput.vue";
 import ProfileSkeleton from "@/components/ProfileSkeleton.vue";
-import { User, Pencil, Trash2, Mail, MapPin, Phone } from "lucide-vue-next";
 
 // Cropper
 import { Cropper, CircleStencil } from "vue-advanced-cropper";
 import "vue-advanced-cropper/dist/style.css";
 
+import { require, isEmail, validates } from "@/utils/validate";
+
 const router = useRouter();
 const MyProfileStore = useProfileStore();
 const AuthStore = useAuthStore();
 const toast = useToast();
+const route = useRoute();
 
 const open = ref(false);
 const edit = ref(false);
@@ -373,17 +388,84 @@ onMounted(async () => {
   if (MyProfileStore.myProfile) {
     editProfile.value = { ...MyProfileStore.myProfile };
   }
+  if (MyProfileStore.mustEdit) {
+    edit.value = true; 
+    validate();
+    MyProfileStore.mustEdit = false;
+  }
 });
 
+const err = reactive({
+  name: "",
+  email: "",
+  location: "",
+  phone: "",
+});
+
+watch(
+  () => editProfile.value.email,
+  (newValue) => {
+    err.email = validates(newValue, [
+      (v) => require(v, "Email is required"),
+      (v) => isEmail(v, "Wrong Format Email"),
+    ]);
+  },
+);
+
+watch(
+  () => editProfile.value.name,
+  (newValue) => {
+    err.name = require(newValue, "Name is required");
+  },
+);
+
+watch(
+  () => editProfile.value.location,
+  (newValue) => {
+    err.location = require(newValue, "Location is required");
+  },
+);
+
+watch(
+  () => editProfile.value.phone,
+  (newValue) => {
+    err.phone = require(newValue, "Phone is required");
+  },
+);
+
+function validate() {
+  err.email = validates(editProfile.value.email, [
+    (v) => require(v, "Email is require"),
+    (v) => isEmail(v, "Wrong Format Email"),
+  ]);
+
+  err.name = require(editProfile.value.name, "Name is require");
+  err.location = require(editProfile.value.location, "Location is require");
+  err.phone = require(editProfile.value.phone, "Phone is require");
+
+  return !err.email && !err.name && !err.location && !err.phone;
+}
+
 const toggleModal = () => (open.value = !open.value);
-const editModal = () => (edit.value = !edit.value);
+
+const editModal = () => {
+  edit.value = !edit.value;
+  // Reset data back to store version if modal is closed
+  if (edit.value === false) {
+    editProfile.value = { ...MyProfileStore.myProfile };
+    err.name = "";
+    err.email = "";
+    err.location = "";
+    err.phone = "";
+  }
+};
+
 const Remove_Modal = () => (remove.value = !remove.value);
 
 const handleFile = (event) => {
   const file = event.target.files[0];
   if (!file) return;
 
-  // Cleanup old object URL if exists
   if (imageSource.value) URL.revokeObjectURL(imageSource.value);
 
   imageSource.value = URL.createObjectURL(file);
@@ -436,6 +518,7 @@ async function removeAvatar() {
 }
 
 async function UpdateProfile() {
+  if (!validate()) return;
   Loading.value = true;
   try {
     await api.put("/api/profile/info", editProfile.value);
@@ -466,7 +549,6 @@ function formatDate(dateString) {
 </script>
 
 <style scoped>
-/* FIX: Force the cropping area to show as a circle overlay */
 .cropper-container {
   height: 400px;
   background: #111;
@@ -479,13 +561,11 @@ function formatDate(dateString) {
   width: 100%;
 }
 
-/* Deep selectors to override the library's default square look */
 :deep(.vue-circle-stencil) {
   border: 2px solid #fff;
 }
 
 :deep(.vue-cropper__stencil) {
-  /* This creates the dark overlay outside the circle */
   box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.6);
 }
 
@@ -493,7 +573,6 @@ function formatDate(dateString) {
   object-fit: cover;
 }
 
-/* Timeline Styles */
 ul.timeline {
   list-style-type: none;
   position: relative;
@@ -535,7 +614,6 @@ ul.timeline > li:before {
   border-radius: 14px;
 }
 
-/* New Hover Effect for Dropdown */
 .dropdown-menu {
   border-radius: 12px !important;
   padding: 10px !important;
@@ -552,5 +630,4 @@ ul.timeline > li:before {
   background-color: #edf2f7 !important;
   border-radius: 5px;
 }
-
 </style>

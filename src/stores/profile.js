@@ -4,6 +4,7 @@ import { ref } from "vue";
 export const useProfileStore = defineStore("profile", () => {
   let loading = ref(false);
   let myProfile = ref([]);
+  let mustEdit = ref(false);
   async function fetchMyProfile() {
     loading.value = true;
     try {
