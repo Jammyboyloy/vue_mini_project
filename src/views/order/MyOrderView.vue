@@ -139,11 +139,9 @@
                   >Delivery Status</label
                 >
                 <span class="small fw-bold">
-                  {{
-                    selectedOrder.is_delivery === 2
+                  {{selectedOrder.is_delivery === 2
                       ? "🚚 Delivery Required"
-                      : "🏠 Self Pickup"
-                  }}
+                      : "🏠 Self Pickup"}}
                 </span>
               </div>
               <div class="col-6 text-end" v-if="selectedOrder.google_map_url">
@@ -168,9 +166,7 @@
 
           <div class="col-6">
             <label class="text-muted small d-block">Seller Email</label>
-            <span class="small text-truncate d-block">{{
-              selectedOrder.seller?.email
-            }}</span>
+            <span class="small text-truncate d-block">{{selectedOrder.seller?.email}}</span>
           </div>
           <div class="col-6">
             <label class="text-muted small d-block">Seller Name</label>
