@@ -9,7 +9,7 @@ export function isEmail(value, message = "This field is require") {
 }
 
 export function isPassword(value, message) {
-  return /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/.test(
+  return /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{5,}$/.test(
     String(value).trim(),
   )
     ? ""
@@ -18,6 +18,10 @@ export function isPassword(value, message) {
 
 export function checkContent(value, message) {
   return value.trim().length >= 10 ? "" : message;
+}
+
+export function checkPhone(value, message) {
+  return value.trim().length >= 9 ? "" : message;
 }
 
 export function isPrice(value, message) {

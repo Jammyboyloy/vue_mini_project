@@ -10,7 +10,7 @@ const order = useOrderStore();
 
 onMounted(async () => {
     await profile.fetchMyProfile();
-    // await cart.fetchMyCart();
+    await cart.fetchMyCart();
     await order.fetchMyOrder(1,100);
 });
 
@@ -50,7 +50,7 @@ function formatCurrency(value) {
 </script>
 
 <template>
-    <div class="min-vh-100 d-flex align-items-center justify-content-center py-5 px-3">
+    <div class="d-flex justify-content-center mt-7">
         <div class="w-100" style="max-width: 720px;">
             <div class="bg-white rounded-4 overflow-hidden shadow">
 
@@ -183,13 +183,6 @@ function formatCurrency(value) {
                     </div>
 
                 </div>
-
-                <!-- Footer -->
-                <div class="text-center text-muted small py-3 px-4 bg-btn"
-                    style=" border-top: 1.5px solid rgba(66,184,131,0.15);">
-                    Questions about this receipt?
-                </div>
-
             </div>
         </div>
     </div>

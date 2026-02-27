@@ -4,11 +4,17 @@
       class="modal d-block"
       tabindex="-1"
       aria-hidden="true"
-      style="background: rgba(0, 0, 0, 0.3)"
+      :style="{ background: fullscreen ? 'rgba(0, 0, 0, 1)' : 'rgba(0, 0, 0, 0.3)' }"
       @click.self="$emit('closeModal')"
     >
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content px-2">
+      <div 
+        class="modal-dialog" 
+        :class="[fullscreen ? 'modal-fullscreen' : 'modal-dialog-centered']"
+      >
+        <div 
+          class="modal-content px-2" 
+          :class="{ 'bg-black text-white border-0': fullscreen }"
+        >
           <div class="modal-header border-0">
             <slot name="header"></slot>
           </div>
@@ -28,16 +34,14 @@
 
 <script setup>
 defineProps({
-  closeText: {
-    type: String,
-    default: "Cancel",
-  },
   position: {
     type: String,
     default: "",
   },
+  fullscreen: {
+    type: Boolean,
+    default: false,
+  }
 });
 defineEmits(["closeModal"]);
 </script>
-
-<style scoped></style>

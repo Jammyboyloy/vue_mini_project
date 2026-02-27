@@ -1,5 +1,12 @@
 <template>
   <div>
+    <div v-if="isLoading" class="full-loader">
+      <div class="loader">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </div>
+    </div>
     <div
       class="d-flex justify-content-center align-items-center min-vh-100 py-4 shadow-sm bg-light"
     >
@@ -126,22 +133,23 @@
 
 <script setup>
 import { useAuthStore } from "@/stores/auth";
-import { ref, reactive } from "vue";
+import { ref, reactive, watch } from "vue"; // Added watch
 import { useRouter } from "vue-router";
-import { isEmail, require, validates } from "@/utils/validate";
+import { isEmail, require, validates, isPassword } from "@/utils/validate";
 import BaseInput from "@/components/BaseInput.vue";
-import { notify } from "@/utils/toast";
+import { useToast } from "vue-toastification";
+
 const auth = useAuthStore();
+const router = useRouter();
+let toast = useToast();
 
 const email = ref("");
 const name = ref("");
 const password = ref("");
 const password_confirmation = ref("");
 const isLoading = ref(false);
-const router = useRouter();
 const showPassword = ref(false);
 const showConfirmPassword = ref(false);
-let toast = notify(router);
 
 const togglePassword = () => {
   showPassword.value = !showPassword.value;
@@ -158,15 +166,63 @@ const err = reactive({
   password_confirmation: "",
 });
 
-function validate() {
-  err.email = validates(email.value, [
-    (v) => require(v, "Email is require"),
-    (v) => isEmail(v, "Wrong Format Email"),
+watch(name, (v) => {
+  err.name = require(v, "Name is required");
+});
+
+watch(email, (v) => {
+  err.email = validates(v, [
+    (val) => require(val, "Email is required"),
+    (val) => isEmail(val, "Wrong Format Email"),
+  ]);
+});
+
+watch(password, (v) => {
+  err.password = validates(v, [
+    (val) => require(val, "Password is required"),
+    (val) =>
+      isPassword(
+        val,
+        "Password must be 5+ chars, include uppercase, number, and symbol",
+      ),
   ]);
 
-  err.password = require(password.value, "Password is require");
-  err.name = require(name.value, "Name is require");
-  err.password_confirmation = require(password_confirmation.value, "Confirm password is require");
+  if (password_confirmation.value) {
+    checkPasswordsMatch();
+  }
+});
+
+watch(password_confirmation, () => {
+  checkPasswordsMatch();
+});
+
+function checkPasswordsMatch() {
+  const req = require(password_confirmation.value, "Confirm password is required");
+  if (req) {
+    err.password_confirmation = req;
+  } else if (password.value !== password_confirmation.value) {
+    err.password_confirmation = "Passwords do not match";
+  } else {
+    err.password_confirmation = "";
+  }
+}
+
+function validate() {
+  err.name = require(name.value, "Name is required");
+  err.email = validates(email.value, [
+    (v) => require(v, "Email is required"),
+    (v) => isEmail(v, "Wrong Format Email"),
+  ]);
+  err.password = validates(password.value, [
+    (v) => require(v, "Password is required"),
+    (v) =>
+      isPassword(
+        v,
+        "Password must be 8+ chars, include uppercase, number, and symbol",
+      ),
+  ]);
+
+  checkPasswordsMatch();
 
   return !err.email && !err.password && !err.name && !err.password_confirmation;
 }
@@ -181,9 +237,15 @@ async function handleRegister() {
       password.value,
       password_confirmation.value,
     );
-    toast.success("Sign Up Successfully!", "/login");
-  } catch (err) {
-    console.log(err);
+    router.push("/login");
+    toast.success("Sign Up Successfully!");
+  } catch (error) {
+    console.log(error);
+    if (error.response?.data?.code === 1 && error.response?.data?.data?.email) {
+      toast.error(error.response.data.data.email[0]);
+    } else {
+      toast.error("Registration failed. Please try again.");
+    }
   } finally {
     isLoading.value = false;
   }
