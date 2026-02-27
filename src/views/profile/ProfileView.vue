@@ -365,7 +365,7 @@ import ProfileSkeleton from "@/components/ProfileSkeleton.vue";
 import { Cropper, CircleStencil } from "vue-advanced-cropper";
 import "vue-advanced-cropper/dist/style.css";
 
-import { require, isEmail, validates } from "@/utils/validate";
+import { require, isEmail, validates, isPrice, checkPhone } from "@/utils/validate";
 
 const router = useRouter();
 const MyProfileStore = useProfileStore();
@@ -413,6 +413,17 @@ watch(
 );
 
 watch(
+  () => editProfile.value.phone,
+  (newValue) => {
+    err.phone = validates(newValue, [
+      (v) => require(v, "Phone is required"),
+      (v) => isPrice(v, "Phone must be a number"),
+      (v) => checkPhone(v, "Phone must be at least 9 digits"),
+    ]);
+  },
+);
+
+watch(
   () => editProfile.value.name,
   (newValue) => {
     err.name = require(newValue, "Name is required");
@@ -426,22 +437,20 @@ watch(
   },
 );
 
-watch(
-  () => editProfile.value.phone,
-  (newValue) => {
-    err.phone = require(newValue, "Phone is required");
-  },
-);
-
 function validate() {
   err.email = validates(editProfile.value.email, [
     (v) => require(v, "Email is require"),
     (v) => isEmail(v, "Wrong Format Email"),
   ]);
 
+  err.phone = validates(editProfile.value.phone, [
+    (v) => require(v, "Phone is require"),
+    (v) => isPrice(v, "Phone must be a number"),
+    (v) => isPrice(v, "Phone must be at least 9 digits"),
+  ]);
+
   err.name = require(editProfile.value.name, "Name is require");
   err.location = require(editProfile.value.location, "Location is require");
-  err.phone = require(editProfile.value.phone, "Phone is require");
 
   return !err.email && !err.name && !err.location && !err.phone;
 }

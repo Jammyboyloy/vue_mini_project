@@ -24,7 +24,9 @@
           <div class="d-flex justify-content-between align-items-start mb-3">
             <div class="stat-info">
               <p class="text-secondary fw-medium mb-1">Total Revenue</p>
-              <h2 class="fw-bold mb-0 text-dark">$12,850.00</h2>
+              <h2 class="fw-bold mb-0 text-dark">
+                ${{ order.formattedRevenue }}
+              </h2>
             </div>
             <div class="stat-icon bg-cate-success text-success">
               <DollarSign class="text-success" :size="24" />
@@ -45,8 +47,10 @@
         <div class="stats-card p-4 border-0 rounded-4 shadow-sm bg-white">
           <div class="d-flex justify-content-between align-items-start mb-3">
             <div class="stat-info">
-              <p class="text-secondary fw-medium mb-1">Orders Processed</p>
-              <h2 class="fw-bold mb-0">458</h2>
+              <p class="text-secondary fw-medium mb-1">Total Orders</p>
+              <h2 class="fw-bold mb-0 text-dark">
+                {{ String(order.orderProduct.length).padStart(2, "0") }}
+              </h2>
             </div>
             <div class="stat-icon bg-cate-primary">
               <ShoppingBag class="text-primary" :size="24" />
@@ -54,8 +58,8 @@
           </div>
           <div class="stat-footer mt-2">
             <span class="text-muted small">
-              <CheckCircle :size="14" class="text-success me-1" /> 12 pending
-              today
+              <CheckCircle :size="14" class="text-success me-1" />
+              {{ order.pendingOrders.length }} pending today
             </span>
           </div>
         </div>
@@ -65,8 +69,10 @@
         <div class="stats-card p-4 border-0 rounded-4 shadow-sm bg-white">
           <div class="d-flex justify-content-between align-items-start mb-3">
             <div class="stat-info">
-              <p class="text-secondary fw-medium mb-1">Low Stock Items</p>
-              <h2 class="fw-bold mb-0 text-danger">08</h2>
+              <p class="text-secondary fw-medium mb-1">Total Items</p>
+              <h2 class="fw-bold mb-0 text-dark">
+                {{ String(own.pagination.total).padStart(2, "0") }}
+              </h2>
             </div>
             <div class="stat-icon bg-cate-warning">
               <AlertTriangle class="text-warning" :size="24" />
@@ -99,6 +105,10 @@
           <span class="bar"></span>
         </div>
         <p class="mt-3 text-muted small">Loading your products...</p>
+      </div>
+
+      <div v-else-if="own.ownProduct.length === 0">
+        <p class="text-muted text-center">No Product</p>
       </div>
 
       <BaseTable
@@ -190,8 +200,12 @@ import BasePagination from "@/components/BasePagination.vue";
 import { onMounted, ref } from "vue";
 import api from "@/api/https";
 import { useRouter } from "vue-router";
+// import noImage from "@/assets/img/no-image.jpeg";
 import { useToast } from "vue-toastification";
+import { useOrderStore } from "@/stores/order";
 let toast = useToast();
+
+let order = useOrderStore();
 
 const own = useOwnProductStore();
 let columns = [
@@ -242,8 +256,15 @@ const goCreateProduct = () => {
   router.push("/dashboard/createProduct");
 };
 
+// const NO_IMAGE_URL = noImage;
+
+// const handleImageError = (event) => {
+//   event.target.src = NO_IMAGE_URL;
+// };
+
 onMounted(() => {
   own.fetchMyOwnProduct(1, per_page.value);
+  order.fetchOrder();
 });
 </script>
 

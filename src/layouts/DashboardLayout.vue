@@ -94,6 +94,7 @@ const menuItems = [
   height: 100vh;
   flex-shrink: 0;
   overflow: visible !important; 
+  z-index: 100;
 }
 
 .sidebar.collapsed {
@@ -207,7 +208,7 @@ const menuItems = [
   opacity: 0;
   visibility: hidden;
   transition: transform 0.2s ease, opacity 0.2s ease;
-  z-index: 9999; 
+  z-index: 1000; 
   box-shadow: 10px 10px 20px rgba(0,0,0,0.2);
   pointer-events: none;
   border: 1px solid rgba(255,255,255,0.1);
@@ -219,7 +220,7 @@ const menuItems = [
   flex-direction: column;
   height: 100vh;
   min-width: 0;
-  z-index: 1; 
+  z-index: auto; 
 }
 
 .content-body {

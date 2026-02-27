@@ -21,8 +21,25 @@ export const useOrderStore = defineStore("order", () => {
   const processedCurrentPage = ref(1);
   const itemsPerPage = 5;
 
+  const totalApprovedRevenue = computed(() => {
+    return orderProduct.value
+      .filter((item) => item.status === 2)
+      .reduce((sum, item) => {
+        const itemPrice = Number(item.price) || 0;
+        const itemQty = Number(item.qty) || 1;
+        return sum + itemPrice * itemQty;
+      }, 0);
+  });
+
+  const formattedRevenue = computed(() => {
+    return totalApprovedRevenue.value.toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  });
+
   const allProcessed = computed(() =>
-    orderProduct.value.filter((item) => item.status === 2 || item.status === 3)
+    orderProduct.value.filter((item) => item.status === 2 || item.status === 3),
   );
 
   const processedOrders = computed(() => {
@@ -43,11 +60,11 @@ export const useOrderStore = defineStore("order", () => {
       current_page: currentPage,
       last_page: lastPage,
       total: total,
-      first_item: first,      
-      last_item: last,        
+      first_item: first,
+      last_item: last,
       on_first_page: currentPage === 1,
       has_more_pages: currentPage < lastPage,
-      has_page: lastPage > 1
+      has_page: lastPage > 1,
     };
   });
 
@@ -104,8 +121,10 @@ export const useOrderStore = defineStore("order", () => {
     orderProduct,
     pendingOrders,
     processedOrders,
-    processedPaginationUI, 
+    processedPaginationUI,
     processedCurrentPage,
+    totalApprovedRevenue,
+    formattedRevenue,
     myOrder,
     pagination,
     fetchOrder,
