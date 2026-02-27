@@ -18,72 +18,78 @@
       </button>
     </div>
 
-    <div class="row g-4">
-      <div class="col-md-4">
-        <div class="stats-card p-4 border-0 rounded-4 shadow-sm bg-white">
-          <div class="d-flex justify-content-between align-items-start mb-3">
-            <div class="stat-info">
-              <p class="text-secondary fw-medium mb-1">Total Revenue</p>
-              <h2 class="fw-bold mb-0 text-dark">
-                ${{ order.formattedRevenue }}
-              </h2>
-            </div>
-            <div class="stat-icon bg-cate-success text-success">
-              <DollarSign class="text-success" :size="24" />
-            </div>
-          </div>
-          <div class="stat-footer mt-2 d-flex align-items-center">
-            <span
-              class="badge bg-cate-success text-success border-0 rounded-pill px-2 py-1"
-            >
-              <TrendingUp :size="12" class="me-1" /> +14.5%
-            </span>
-            <span class="text-muted small ms-2">vs last month</span>
-          </div>
-        </div>
-      </div>
+    <template v-if="order.loading">
+      <StatsCardSkeleton />
+    </template>
 
-      <div class="col-md-4">
-        <div class="stats-card p-4 border-0 rounded-4 shadow-sm bg-white">
-          <div class="d-flex justify-content-between align-items-start mb-3">
-            <div class="stat-info">
-              <p class="text-secondary fw-medium mb-1">Total Orders</p>
-              <h2 class="fw-bold mb-0 text-dark">
-                {{ String(order.orderProduct.length).padStart(2, "0") }}
-              </h2>
+    <template v-else>
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="stats-card p-4 border-0 rounded-4 shadow-sm bg-white">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <div class="stat-info">
+                <p class="text-secondary fw-medium mb-1">Total Revenue</p>
+                <h2 class="fw-bold mb-0 text-dark">
+                  ${{ order.formattedRevenue }}
+                </h2>
+              </div>
+              <div class="stat-icon bg-cate-success text-success">
+                <DollarSign class="text-success" :size="24" />
+              </div>
             </div>
-            <div class="stat-icon bg-cate-primary">
-              <ShoppingBag class="text-primary" :size="24" />
+            <div class="stat-footer mt-2 d-flex align-items-center">
+              <span
+                class="badge bg-cate-success text-success border-0 rounded-pill px-2 py-1"
+              >
+                <TrendingUp :size="12" class="me-1" /> +14.5%
+              </span>
+              <span class="text-muted small ms-2">vs last month</span>
             </div>
-          </div>
-          <div class="stat-footer mt-2">
-            <span class="text-muted small">
-              <CheckCircle :size="14" class="text-success me-1" />
-              {{ order.pendingOrders.length }} pending today
-            </span>
           </div>
         </div>
-      </div>
 
-      <div class="col-md-4">
-        <div class="stats-card p-4 border-0 rounded-4 shadow-sm bg-white">
-          <div class="d-flex justify-content-between align-items-start mb-3">
-            <div class="stat-info">
-              <p class="text-secondary fw-medium mb-1">Total Items</p>
-              <h2 class="fw-bold mb-0 text-dark">
-                {{ String(own.pagination.total).padStart(2, "0") }}
-              </h2>
+        <div class="col-md-4">
+          <div class="stats-card p-4 border-0 rounded-4 shadow-sm bg-white">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <div class="stat-info">
+                <p class="text-secondary fw-medium mb-1">Total Orders</p>
+                <h2 class="fw-bold mb-0 text-dark">
+                  {{ String(order.orderProduct.length).padStart(2, "0") }}
+                </h2>
+              </div>
+              <div class="stat-icon bg-cate-primary">
+                <ShoppingBag class="text-primary" :size="24" />
+              </div>
             </div>
-            <div class="stat-icon bg-cate-warning">
-              <AlertTriangle class="text-warning" :size="24" />
+            <div class="stat-footer mt-2">
+              <span class="text-muted small">
+                <CheckCircle :size="14" class="text-success me-1" />
+                {{ order.pendingOrders.length }} pending today
+              </span>
             </div>
           </div>
-          <div class="stat-footer mt-2">
-            <span class="text-muted small">Need to restock soon</span>
+        </div>
+
+        <div class="col-md-4">
+          <div class="stats-card p-4 border-0 rounded-4 shadow-sm bg-white">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <div class="stat-info">
+                <p class="text-secondary fw-medium mb-1">Total Items</p>
+                <h2 class="fw-bold mb-0 text-dark">
+                  {{ String(own.pagination.total).padStart(2, "0") }}
+                </h2>
+              </div>
+              <div class="stat-icon bg-cate-warning">
+                <Store class="text-warning" :size="24" />
+              </div>
+            </div>
+            <div class="stat-footer mt-2">
+              <span class="text-muted small">Total products available</span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </template>
 
     <div class="d-flex align-items-center gap-3 mt-5">
       <div class="icon-box-title">
@@ -197,6 +203,7 @@ import BaseModal from "@/components/BaseModal.vue";
 import { useOwnProductStore } from "@/stores/OwnProduct";
 import BaseTable from "@/components/BaseTable.vue";
 import BasePagination from "@/components/BasePagination.vue";
+import StatsCardSkeleton from "@/components/StatsCardSkeleton.vue";
 import { onMounted, ref } from "vue";
 import api from "@/api/https";
 import { useRouter } from "vue-router";
