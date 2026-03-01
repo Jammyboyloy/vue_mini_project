@@ -11,7 +11,7 @@ const cart = useCartStore();
 const router = useRouter();
 
 onMounted(() => {
-  product.fetchProduct();
+  product.fetchProduct("");
 });
 
 const handleCart = (id) => {
